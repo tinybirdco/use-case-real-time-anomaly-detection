@@ -21,6 +21,8 @@ This tool generates time-series data with these outliers and anomalies:
 
 Kicking off the project with a set of data generator tools. These tools generate single-value time-series data for a set of sensors. Data from the sensors are emitted on a configured interval.
 
+See the [the data-generator readme](../data-generator/readme.md) for more details.
+
 ### Trend types
 
 Sensors can be seeded with a *trend* setting. 
