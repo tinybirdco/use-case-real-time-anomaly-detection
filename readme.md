@@ -1,6 +1,6 @@
 
 
-## Amonaly detection 
+## Anomaly detection 
 
 This repo is a collection of things in support of demonstrating how Tinybird can be used to support anomaly-detection systems. 
 
