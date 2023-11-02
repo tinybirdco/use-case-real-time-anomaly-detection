@@ -2,8 +2,12 @@
 
 ## Amonaly detection 
 
-This repo is a collection of things in support of sowing how Tinybird can be used to support anomaly-detection systems. 
+This repo is a collection of things in support of demonstrating how Tinybird can be used to support anomaly-detection systems. 
 
+The first step is building some tools for generating time-series data with anomalies and outliers in it. The core of this tool will generate a time-series with the following features:
+* Steady-state values with small random fluctuations.
+* Random and isolated outliers that are outside of a "valid" range.  
+* Step-functions where the data jumps upwards and downwards. Here the slope between points is an anomaly. 
 
 ### Anomaly types
 
@@ -15,10 +19,7 @@ This tool generates time-series data with these outliers and anomalies:
 
 ### Data generation 
 
-Kicking off the project with a set of data generator tools. Looking to demonstrate how to detect several types of anomalies, including:
-
-
-This tool generates single-value time-series data for a set of sensors. Data from the sensor set is emitted on a configured interval.
+Kicking off the project with a set of data generator tools. These tools generate single-value time-series data for a set of sensors. Data from the sensors are emitted on a configured interval.
 
 ### Trend types
 
