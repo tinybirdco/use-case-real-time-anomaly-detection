@@ -1,13 +1,24 @@
+import requests
 import random
 import datetime
 import csv
 import os
+import json
 import datetime
+from dotenv import load_dotenv
+
+dotenv_path = os.path.join(os.path.dirname(__file__), '../config', '.env')
+load_dotenv(dotenv_path)
 
 num_sensors = 10
-num_iterations = 10000
+num_iterations = 1000000  # Nearly three hours with a 1-second interval. 
 sample_interval = 1 # seconds 
-file_name = 'anomaly-dataset.csv'
+
+# Set the Tinybird Events API endpoint and load the API token from the local environment (.env). 
+# TODO: not batching reports sent to Tinybird. 
+tinybird_url = "https://api.tinybird.co/v0/events?name=incoming_data"
+tinybird_token = os.environ.get('TINYBIRD_TOKEN')
+headers = {"Authorization": f"Bearer {tinybird_token}", "Content-Type": "application/json"}
 
 class Sensor:
     def __init__(self, sensor_id):
@@ -22,13 +33,11 @@ class Sensor:
         self.report = {}
         self.report['timestamp'] = self.timestamp
         self.report['value'] = self.value
-        self.reports.append(self.report)
-   
+    
         self.stopped = False
         self.absent = False
         self.trend = None # 'up', 'down'
 
-        # TODO: needed?
         # Some persistent stats
         self.window = 3600 # seconds.
         self.average = 0
@@ -67,7 +76,6 @@ class Sensor:
                 elif self.trend == 'down':
                     change = -step_amount
             else:    
-                #change = value * random.uniform(-0.001, 0.001)
                 change = random.uniform(-1,1)
                 
             value = value + change
@@ -84,32 +92,17 @@ class Sensor:
         # Calculate new value
         self.value = self.generate_new_value()
         # Calculate new timestamp
-        self.timestamp = add_seconds_to_timestamp(self.timestamp)
-
+        
+        self.timestamp = generate_timestamp()
         # Create new report
         self.report = {}
+        
         self.report['timestamp'] = self.timestamp
         self.report['value'] = self.value
-        
-        self.reports.append(self.report)
 
-def assemble_sensor_data(sensors):
-   
-    data = []
-
-    for i in range(num_iterations):  
-        data_line = []
-        data_line.append(sensors[0].reports[i]['timestamp'])
-        
-        for sensor in sensors:
-            try: 
-                data_line.append(round(sensor.reports[i]['value'],2))
-            except:
-                data_line.append(' ')
-
-        data.append(data_line)
-
-    return data
+        self.report['id'] = self.id # Need to send sensor ID. 
+        report_json = json.dumps(self.report)
+        response = requests.post(tinybird_url, headers=headers, data=report_json)
 
 def sensor_presets(sensors):
     sensors[2].trend = 'up'
@@ -151,10 +144,12 @@ def generate_dataset():
     stopped_sensor_id = 5
     stopped_iteration = random.randint(100,200)
 
+    print("Starting to stream data to the Events API...")
+
     # March through the configured iterations... 
     for i in range(num_iterations):
         for sensor in sensors:    
-            #print(f"Generating new sample for sensor {sensor.id}")
+            # print(f"Generating new sample for sensor {sensor.id}")
             if sensor.stopped:
                 # print(f"Sensor {sensor.id} has stopped reporting.")
                 # TODO: May want mechanism for a sensor to restart. 
@@ -165,33 +160,12 @@ def generate_dataset():
             # If the sensor is the randomly selected sensor and it has reached 50 iterations, stop it from reporting
             if i == stopped_iteration and sensor.id == stopped_sensor_id:
                 sensor.stopped = True
-  
-    # Finished, now write data to a file.       
-    with open(file_name, "w", newline="") as csv_file:
-        writer = csv.writer(csv_file)
-
-        header_line = []
-        header_line.append("Timestamp")
-        for i in range(num_sensors):
-            header_line.append(f"sensor {i+1}")
-
-        writer.writerow(header_line)
-        data = assemble_sensor_data(sensors)
-        writer.writerows(data)
-
-    print(f"Sensor data has been written to {file_name}.")
-
+    
 def generate_timestamp():
     # Get the current datetime object
     now = datetime.datetime.now()
     # Format the datetime object in the "%Y-%m-%d %H:%M:%S.0" format
     timestamp = now.strftime('%Y-%m-%d %H:%M:%S.0')
-    return timestamp
-    
-def add_seconds_to_timestamp(timestamp):
-    timestamp = datetime.datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.0')
-    timestamp += datetime.timedelta(seconds=sample_interval)
-    timestamp = timestamp.strftime('%Y-%m-%d %H:%M:%S.0')
     return timestamp
 
 if __name__ == '__main__':
