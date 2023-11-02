@@ -25,9 +25,14 @@ Kicking off the project with a set of data generator tools. These tools generate
 
 Sensors can be seeded with a *trend* setting. 
 
+#### No trend
 
 ![No trending](./charts/no-trend.png)
 
+#### Trend up
+
 ![Trending up](./charts/trend-up.png)
+
+#### Trend down
 
 ![Trending down](./charts/trend-down.png)
