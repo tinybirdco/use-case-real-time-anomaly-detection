@@ -4,7 +4,6 @@ With data set files, we will be able to curate datasets with anomaly artifacts t
 
 Started with a script that generates and writes data set files. Now refactoring to generate a real-time time-series, using the same "data with anomalies" design, but instead posting the data to the Events API. 
 
-
 ## anomaly-dataset-to-file.py
 
 Builds CSV files that look like this: 
@@ -23,6 +22,12 @@ Timestamp,sensor 1,sensor 2,sensor 3,sensor 4,sensor 5,sensor 6,sensor 7,sensor 
 2023-11-02 16:55:25.0,541.52,569.08,199.14,699.79,591.34,684.65,496.25,634.55,471.46,598.65
 2023-11-02 16:55:26.0,541.8,569.32,199.54,699.53,591.86,685.17,496.55,635.26,470.58,599.07
 ```
+
+## anomaly-dataset-live.py
+
+Posts each new report to the Events API. No longer using synthetic timestamps and now everything is Now(). 
+
+If this POC evolves, these two script could share common "generate data with anomalies" code. 
 
 ### Trend types
 
