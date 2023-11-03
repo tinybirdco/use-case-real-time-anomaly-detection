@@ -1,0 +1,73 @@
+NODE context
+SQL >
+
+    %
+        SELECT 
+            sum(value) value,
+            toStartOfInterval(timestamp, INTERVAL {{Int32(interval_duration, 10)}} second) date
+        FROM
+            incoming_data
+        WHERE
+            timestamp between now() - interval {{Int32(minutes, 30)}} minute and now()
+            AND id = 1
+        GROUP BY
+            date
+        ORDER BY
+            date
+
+
+
+NODE context_stats
+SQL >
+
+    %
+        SELECT 
+        avg(value) avg_value,
+        stddevPop(value) std
+        FROM (
+            with (select (avg(value), stddevPop(value)) std FROM context) as ss
+            SELECT * FROM context WHERE value < ss.1 + 1.5 * ss.2
+        )
+
+
+
+NODE anomalies
+SQL >
+
+    %
+        SELECT
+            date, 
+            (value - avg_value) / std as zscore,
+            value,
+            multiIf(value == 0, 'error', zscore < -1 * {{Float32(zscore, 2)}}, 'error', 'ok') anomaly_low,
+            multiIf(value == 0, 'error', zscore > {{Float32(zscore, 2)}}, 'error', 'ok') anomaly_high
+        FROM (
+          SELECT
+            avg(value) value,
+            date
+          FROM context
+          WHERE
+            date between now() - interval {{Int32(duration, 40)}} second and now()
+          GROUP BY
+            date
+        )
+        CROSS JOIN (
+          SELECT
+            *
+          FROM 
+            context_stats
+        )
+        ORDER BY date DESC
+        LIMIT 10000 OFFSET 1
+
+
+
+NODE z_score_3
+SQL >
+
+    % SELECT  if(arrayAll(x -> x == 'error', groupArray(anomaly_low)) == 1, 'error', 'ok') anomaly_low,
+            if(arrayAll(x -> x == 'error', groupArray(anomaly_high)) == 1, 'error', 'ok') anomaly_high,
+            now() as timestamp
+        FROM anomalies
+
+
