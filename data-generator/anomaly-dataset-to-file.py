@@ -183,15 +183,15 @@ def generate_dataset():
 
 def generate_timestamp():
     # Get the current datetime object
-    now = datetime.datetime.now()
+    now = datetime.datetime.utcnow()
     # Format the datetime object in the "%Y-%m-%d %H:%M:%S.0" format
-    timestamp = now.strftime('%Y-%m-%d %H:%M:%S.0')
+    timestamp = now.strftime('%Y-%m-%dT%H:%M:%S.0Z')
     return timestamp
     
 def add_seconds_to_timestamp(timestamp):
-    timestamp = datetime.datetime.strptime(timestamp, '%Y-%m-%d %H:%M:%S.0')
+    timestamp = datetime.datetime.strptime(timestamp, '%Y-%m-%dT%H:%M:%S.0Z')
     timestamp += datetime.timedelta(seconds=sample_interval)
-    timestamp = timestamp.strftime('%Y-%m-%d %H:%M:%S.0')
+    timestamp = timestamp.strftime('%Y-%m-%dT%H:%M:%S.0Z')
     return timestamp
 
 if __name__ == '__main__':

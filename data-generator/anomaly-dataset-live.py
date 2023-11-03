@@ -98,9 +98,9 @@ class Sensor:
         self.report = {}
         
         self.report['timestamp'] = self.timestamp
-        self.report['value'] = self.value
-
         self.report['id'] = self.id # Need to send sensor ID. 
+        self.report['value'] = round(self.value,2)
+
         report_json = json.dumps(self.report)
         response = requests.post(tinybird_url, headers=headers, data=report_json)
 
@@ -163,9 +163,10 @@ def generate_dataset():
     
 def generate_timestamp():
     # Get the current datetime object
-    now = datetime.datetime.now()
-    # Format the datetime object in the "%Y-%m-%d %H:%M:%S.0" format
-    timestamp = now.strftime('%Y-%m-%d %H:%M:%S.0')
+    now = datetime.datetime.utcnow()
+    # Format the datetime object in the "%Y-%m-%d %H:%M:%S.000" format
+    timestamp = now.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+    
     return timestamp
 
 if __name__ == '__main__':
