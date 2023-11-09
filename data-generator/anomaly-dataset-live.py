@@ -35,7 +35,6 @@ class Sensor:
         self.report['value'] = self.value
     
         self.stopped = False
-        self.absent = False
         self.trend = None # 'up', 'down'
 
         # Some persistent stats
@@ -46,8 +45,8 @@ class Sensor:
         self.min = 0
 
         # Validation metadata
-        self.valid_max = 1000
-        self.valid_min = 200
+        self.valid_max = 2000
+        self.valid_min = 0
    
     def generate_new_value(self):
 
@@ -104,7 +103,20 @@ class Sensor:
         report_json = json.dumps(self.report)
         response = requests.post(tinybird_url, headers=headers, data=report_json)
 
+def generate_timestamp():
+    # Get the current datetime object
+    now = datetime.datetime.utcnow()
+    # Format the datetime object in the "%Y-%m-%d %H:%M:%S.000" format
+    timestamp = now.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+    
+    return timestamp
+
 def sensor_presets(sensors):
+    """
+    Want to override the Sensor class instance defaults? Do that here.
+    """
+
+    # Set up metadata to cause an upward trending sensor. 
     sensors[2].trend = 'up'
     value = 200
     sensors[2].value = value 
@@ -161,13 +173,6 @@ def generate_dataset():
             if i == stopped_iteration and sensor.id == stopped_sensor_id:
                 sensor.stopped = True
     
-def generate_timestamp():
-    # Get the current datetime object
-    now = datetime.datetime.utcnow()
-    # Format the datetime object in the "%Y-%m-%d %H:%M:%S.000" format
-    timestamp = now.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
-    
-    return timestamp
 
 if __name__ == '__main__':
   
