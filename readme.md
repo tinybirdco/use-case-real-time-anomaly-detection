@@ -7,7 +7,19 @@ This repo is a collection of things in support of demonstrating how Tinybird can
 The first step is building some tools for generating time-series data with anomalies and outliers in it. The core of this tool will generate a time-series with the following features:
 * Steady-state values with small random fluctuations.
 * Random and isolated outliers that are outside of a "valid" range.  
-* Step-functions where the data jumps upwards and downwards. Here the slope between points is an anomaly. 
+* Step-functions where the data jumps upwards and downwards. Here the slope between points is an anomaly.
+* Sensors that stop reporting (and so far without any restarting behavior.
+
+Currently the following types of things are hard-coded and could be easily refactored into a configuration if this thing proves useful:
+
+  * num_sensors = 10
+    
+  * Initial sensor values
+    * value = random.randint(400, 700)
+
+  * Validation metadata
+    * valid_max = 2000
+    * valid_min = 0
 
 ### Anomaly types
 
