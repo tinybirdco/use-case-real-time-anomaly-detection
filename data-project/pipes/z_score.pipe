@@ -1,19 +1,21 @@
+TOKEN "zscore_read" READ
+
 NODE context
 SQL >
 
     %
         SELECT 
+            id,
             sum(value) value,
             toStartOfInterval(timestamp, INTERVAL {{Int32(interval_duration, 10)}} second) date
         FROM
             incoming_data
         WHERE
             timestamp between now() - interval {{Int32(minutes, 30)}} minute and now()
-            AND id = 1
         GROUP BY
-            date
+            date, id
         ORDER BY
-            date
+            date DESC
 
 
 
@@ -22,12 +24,16 @@ SQL >
 
     %
         SELECT 
-        avg(value) avg_value,
-        stddevPop(value) std
+        id, 
+        ROUND(avg(value), 2) avg_value,
+        ROUND(stddevPop(value),2) std
         FROM (
-            with (select (avg(value), stddevPop(value)) std FROM context) as ss
+            with (
+              SELECT (avg(value), stddevPop(value)) std 
+              FROM context) as ss
             SELECT * FROM context WHERE value < ss.1 + 1.5 * ss.2
         )
+        GROUP BY id
 
 
 
@@ -37,19 +43,21 @@ SQL >
     %
         SELECT
             date, 
+            id, 
             (value - avg_value) / std as zscore,
             value,
             multiIf(value == 0, 'error', zscore < -1 * {{Float32(zscore, 2)}}, 'error', 'ok') anomaly_low,
             multiIf(value == 0, 'error', zscore > {{Float32(zscore, 2)}}, 'error', 'ok') anomaly_high
         FROM (
           SELECT
+            id,
             avg(value) value,
             date
           FROM context
           WHERE
-            date between now() - interval {{Int32(duration, 40)}} second and now()
+            date BETWEEN NOW() - interval {{Int32(duration, 40)}} second AND NOW()
           GROUP BY
-            date
+            date, id
         )
         CROSS JOIN (
           SELECT
@@ -62,12 +70,21 @@ SQL >
 
 
 
-NODE z_score_3
+NODE set_ok_error_labels
 SQL >
 
-    % SELECT  if(arrayAll(x -> x == 'error', groupArray(anomaly_low)) == 1, 'error', 'ok') anomaly_low,
+    % SELECT  id, if(arrayAll(x -> x == 'error', groupArray(anomaly_low)) == 1, 'error', 'ok') anomaly_low,
             if(arrayAll(x -> x == 'error', groupArray(anomaly_high)) == 1, 'error', 'ok') anomaly_high,
             now() as timestamp
         FROM anomalies
+        GROUP BY id
+
+
+
+NODE endpoint
+SQL >
+
+    SELECT * FROM set_ok_error_labels
+    WHERE anomaly_low = 'error' OR anomaly_high = 'error'
 
 

@@ -1,0 +1,12 @@
+TOKEN "api_ids_endpoint_read_6474" READ
+
+TOKEN "token_340296" READ
+
+NODE endpoint
+SQL >
+
+    SELECT DISTINCT id 
+    FROM incoming_data
+    ORDER BY id ASC
+
+

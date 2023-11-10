@@ -1,0 +1,21 @@
+TOKEN "data_endpoint" READ
+
+NODE endpoint
+DESCRIPTION >
+    {% set id = 1 %}
+
+SQL >
+
+    %
+    SELECT * 
+    FROM incoming_data
+    WHERE 1=1 
+      {% if defined(sensor_id) %}
+         AND id = {{ Int16(sensor_id,description='Sensor ID to return.')}}
+      {% end %}
+      AND toDateTime(timestamp) BETWEEN addDays(now(),-1) AND now()
+    ORDER BY timestamp ASC
+
+
+
+

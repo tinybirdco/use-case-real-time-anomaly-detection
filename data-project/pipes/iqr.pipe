@@ -1,0 +1,32 @@
+DESCRIPTION >
+	TBD, getting worked out on the Playground.
+
+
+TOKEN "iqr_read" READ
+
+NODE endpoint
+SQL >
+
+    WITH stats AS (SELECT id,
+    quantileExact(0.25) (value) AS lower_quartile,
+    quantileExact(0.5) (value) AS mid_quartile,
+    quantileExact(0.75) (value) AS upper_quartile,
+    (upper_quartile - lower_quartile) * 1.5 AS IQR
+    FROM incoming_data
+    WHERE timestamp >= toDate(now()) - interval 1 minutes
+    GROUP BY id
+   
+    )
+     SELECT DISTINCT timestamp, 
+        id, 
+        value, 
+        ROUND((stats.lower_quartile - stats.IQR),2) AS lower_bound, 
+        ROUND((stats.upper_quartile + stats.IQR),2) AS upper_bound 
+     FROM incoming_data
+     JOIN stats ON incoming_data.id = stats.id
+     WHERE timestamp >= toDate(now()) - interval 1 minutes
+     AND (value > (stats.upper_quartile + stats.IQR)
+     OR value < (stats.lower_quartile - stats.IQR))
+     ORDER BY timestamp DESC
+
+
