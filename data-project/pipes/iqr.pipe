@@ -4,8 +4,11 @@ DESCRIPTION >
 
 TOKEN "iqr_read" READ
 
-NODE endpoint
+NODE get_stats
 SQL >
+
+    %
+    {% set _time_window_minutes=10 %}
 
     WITH stats AS (SELECT id,
     quantileExact(0.25) (value) AS lower_quartile,
@@ -13,9 +16,9 @@ SQL >
     quantileExact(0.75) (value) AS upper_quartile,
     (upper_quartile - lower_quartile) * 1.5 AS IQR
     FROM incoming_data
-    WHERE timestamp >= toDate(now()) - interval 1 minutes
+    WHERE timestamp >= toDate(now()) - interval {{Int16(_time_window_minutes)}} minutes
     GROUP BY id
-   
+    LIMIT 10
     )
      SELECT DISTINCT timestamp, 
         id, 
@@ -24,9 +27,40 @@ SQL >
         ROUND((stats.upper_quartile + stats.IQR),2) AS upper_bound 
      FROM incoming_data
      JOIN stats ON incoming_data.id = stats.id
-     WHERE timestamp >= toDate(now()) - interval 1 minutes
+     WHERE timestamp >= toDate(now()) - interval {{Int16(_time_window_minutes)}} minutes
      AND (value > (stats.upper_quartile + stats.IQR)
      OR value < (stats.lower_quartile - stats.IQR))
      ORDER BY timestamp DESC
+
+
+
+
+NODE endpoint
+SQL >
+
+    WITH RankedData AS (
+        SELECT
+            id,
+            timestamp,
+            value,
+            ROW_NUMBER() OVER (PARTITION BY id ORDER BY timestamp DESC) AS row_num,
+            lower_bound,
+            upper_bound
+        FROM
+            get_stats
+    )
+    SELECT
+        id,
+        timestamp,
+        value,
+        lower_bound,
+        upper_bound
+    FROM
+        RankedData
+    WHERE
+        row_num = 1
+    ORDER BY timestamp DESC    
+
+
 
 

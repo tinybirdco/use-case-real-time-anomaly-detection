@@ -1,34 +1,35 @@
-DESCRIPTION >
-	Return a list of sensors that have not reported in 10 seconds.
-
-
 TOKEN "timeout_read" READ
 
-NODE timeout_0
+NODE get_most_recent
 SQL >
 
-    SELECT s.id, 
-        COALESCE(r.report_count, 0) AS report_count
-    FROM (
-        SELECT DISTINCT id
-        FROM incoming_data
-      ORDER BY id ASC
-    ) s
-    LEFT JOIN (
-        SELECT id, COUNT(*) AS report_count
-        FROM incoming_data
-        WHERE timestamp >= NOW() - INTERVAL 10 SECONDS
-        GROUP BY id
-    ) r ON s.id = r.id
+    WITH RankedData AS (
+        SELECT
+            id,
+            timestamp,
+            value,
+            ROW_NUMBER() OVER (PARTITION BY id ORDER BY timestamp DESC) AS row_num
+        FROM
+            incoming_data
+    )
+    SELECT
+        id,
+        timestamp,
+        value
+    FROM
+        RankedData
+    WHERE
+        row_num = 1
 
 
 
 NODE endpoint
 SQL >
 
-    SELECT * FROM timeout_0
-    WHERE report_count = 0
+    %
+    {% set _time_window_seconds=10 %}
 
-
+    SELECT * FROM get_most_recent
+    WHERE timestamp < NOW() - INTERVAL {{Int16(_time_window_seconds)}} SECONDS
 
 

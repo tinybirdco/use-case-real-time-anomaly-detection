@@ -1,0 +1,20 @@
+DESCRIPTION >
+	A simple Pipe that finds threshold, or out-of-range, anomalies.
+
+
+TOKEN "out_of_range_read" READ
+
+NODE endpoint
+SQL >
+
+    %
+    {% set _max_value=2000 %} 
+    {% set _min_value=200 %}
+    {% set _time_window_minutes=5 %}
+
+    SELECT *, {{Int16(_min_value)}} as min_value, {{Int16(_max_value)}} as max_value 
+    FROM incoming_data
+    WHERE (value < {{Int16(_min_value)}} OR value > {{Int16(_max_value)}})
+    AND timestamp > now() - interval {{Int8(_time_window_minutes)}} minute
+
+

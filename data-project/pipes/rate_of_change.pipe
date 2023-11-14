@@ -1,0 +1,35 @@
+DESCRIPTION >
+	Not finished... need rate of change...
+
+
+NODE calculating_slope
+SQL >
+
+    %
+    {% set _time_window_minutes=5 %}
+
+    SELECT id, 
+    timestamp, 
+    value, 
+    lagInFrame(timestamp, 1) OVER 
+    (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS previous_timestamp, 
+    timestamp AS current_timestamp,
+    lagInFrame(value, 1) 
+    OVER (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS previous_value, 
+    value AS current_value,
+    (current_value - previous_value) / (current_timestamp - previous_timestamp) as slope
+    FROM incoming_data
+    WHERE timestamp > now() - interval {{Int8(_time_window_minutes)}} minute
+    ORDER BY timestamp DESC
+
+
+
+
+NODE rate_of_change_1
+SQL >
+
+    SELECT id, timestamp, slope, previous_value, value 
+    FROM calculating_slope
+    WHERE slope > 1
+
+
