@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 dotenv_path = os.path.join(os.path.dirname(__file__), '../config', '.env')
 load_dotenv(dotenv_path)
 
-with open('config.yaml') as file:
+with open('./data-generator/settings.yaml') as file:
     config = yaml.safe_load(file)
 
 num_sensors = config['num_sensors']
@@ -26,7 +26,7 @@ value_min = config['value_min']
 value_max_normal_change = config['value_max_normal_change']
 
 step_max = config['step_max']
-step_min = config['tep_min']
+step_min = config['step_min']
 percent_step = config['percent_step']
 percent_step_trend = config['percent_step_trend']
 percent_out_of_bounds = config['percent_out_of_bounds']
@@ -121,12 +121,12 @@ def generate_timestamp():
     # Get the current datetime object
     now = datetime.datetime.utcnow()
     # Format the datetime object in the "%Y-%m-%d %H:%M:%S.000" format
-    timestamp = now.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-3]
+    timestamp = now.strftime('%Y-%m-%dT%H:%M:%S.%f')[:-2]
     
     return timestamp
 
 def sensor_presets(sensors, config):
-    for sensor_data in config['sensors_overrides']:
+    for sensor_data in config['sensor_overrides']:
         id = sensor_data['id']
         trend = sensor_data['trend']
         initial_value = sensor_data['initial_value']

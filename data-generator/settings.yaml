@@ -9,7 +9,6 @@ valid_max: 2500
 percent_out_of_bounds: 0.05
 percent_out_of_bounds_high: 50
 
-
 value_max: 3000
 value_min: 0
 value_max_normal_change: 1
