@@ -1,18 +1,36 @@
 import requests
 import random
 import datetime
-import csv
 import os
 import json
+import yaml
 import datetime
 from dotenv import load_dotenv
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '../config', '.env')
 load_dotenv(dotenv_path)
 
-num_sensors = 10
-num_iterations = 1000000  # Nearly three hours with a 1-second interval. 
-sample_interval = 1 # seconds 
+with open('config.yaml') as file:
+    config = yaml.safe_load(file)
+
+num_sensors = config['num_sensors']
+num_iterations = config['num_iterations']
+id_init_min = config['id_init_min']
+id_init_max = config['id_init_max']
+
+valid_max = config['valid_max']
+valid_min = config['valid_min']
+
+value_max = config['value_max']
+value_min = config['value_min']
+value_max_normal_change = config['value_max_normal_change']
+
+step_max = config['step_max']
+step_min = config['tep_min']
+percent_step = config['percent_step']
+percent_step_trend = config['percent_step_trend']
+percent_out_of_bounds = config['percent_out_of_bounds']
+percent_out_of_bounds_high = config['percent_out_of_bounds_high']
 
 # Set the Tinybird Events API endpoint and load the API token from the local environment (.env). 
 # TODO: not batching reports sent to Tinybird. 
@@ -25,7 +43,7 @@ class Sensor:
         self.id = sensor_id
     
         self.timestamp = generate_timestamp() 
-        self.value = random.randint(400, 700)
+        self.value = random.randint(id_init_min, id_init_max)
         self.initial_value = self.value
         self.previous_value = self.value
 
@@ -37,16 +55,10 @@ class Sensor:
         self.stopped = False
         self.trend = None # 'up', 'down'
 
-        # Some persistent stats
-        self.window = 3600 # seconds.
-        self.average = 0
-        self.average_window = 0
-        self.max = 0
-        self.min = 0
-
         # Validation metadata
-        self.valid_max = 2000
-        self.valid_min = 0
+        self.valid_min = valid_min
+        self.valid_max = valid_max
+        
    
     def generate_new_value(self):
 
@@ -56,32 +68,34 @@ class Sensor:
             value = self.previous_value
 
         # For some small percentage, generate a out-of-bounds value
-        if random.uniform(0,100) < 0.05:
-            if random.uniform(0,100) < 50:
-                value = random.uniform(0,self.valid_min-20)
+        if random.uniform(0,100) < percent_out_of_bounds:
+            if random.uniform(0,100) < percent_out_of_bounds_high:
+                value = random.uniform(value_min,self.valid_min-20)
             else:
-                value = random.uniform(self.valid_max+20, 1200)
+                value = random.uniform(self.valid_max+20, value_max)
             return value    
         else: #Generate a new value
 
             # For some small percentage, generate a step change
             step_control = random.uniform(0,100)
-            step_amount = random.uniform(50,80)
-            if step_control < 0.03 and self.trend == None:
+            step_amount = random.uniform(step_min, step_max)
+            if step_control < percent_step and self.trend == None:
                 change = random.choice([-1,1]) * step_amount
-            elif step_control < 0.06 and self.trend != None:
+            elif step_control < percent_step_trend and self.trend != None:
                 if self.trend == 'up':
                     change = step_amount
                 elif self.trend == 'down':
                     change = -step_amount
             else:    
-                change = random.uniform(-1,1)
+                change = random.uniform(-value_max_normal_change,value_max_normal_change)
                 
             value = value + change
 
             # If in range, save this as the previous value.
             if value > self.valid_min or value < self.valid_max:
                 self.previous_value = value
+            else:
+                print(f"New value of out range: {value}")    
 
         return value
 
@@ -111,33 +125,21 @@ def generate_timestamp():
     
     return timestamp
 
-def sensor_presets(sensors):
-    """
-    Want to override the Sensor class instance defaults? Do that here.
-    """
+def sensor_presets(sensors, config):
+    for sensor_data in config['sensors_overrides']:
+        id = sensor_data['id']
+        trend = sensor_data['trend']
+        initial_value = sensor_data['initial_value']
 
-    # Set up metadata to cause an upward trending sensor. 
-    sensors[2].trend = 'up'
-    value = 200
-    sensors[2].value = value 
-    sensors[2].initial_value = value 
-    sensors[2].previous_value = value 
-    sensors[2].reports = []
-    report = {}
-    report['timestamp'] = sensors[2].timestamp
-    report['value'] = value
-    sensors[2].reports.append(report)
-    
-    sensors[3].trend = 'down'
-    value = 700
-    sensors[3].value = value 
-    sensors[3].initial_value = value 
-    sensors[3].previous_value = value 
-    sensors[3].reports = []
-    report = {}
-    report['timestamp'] = sensors[3].timestamp
-    report['value'] = value
-    sensors[3].reports.append(report)
+        sensors[id].trend = trend
+        sensors[id].value = initial_value
+        sensors[id].initial_value = initial_value
+        sensors[id].previous_value = initial_value
+        sensors[id].reports = []
+        report = {}
+        report['timestamp'] = sensors[id].timestamp
+        report['value'] = initial_value
+        sensors[id].reports.append(report)
 
     return sensors
 
@@ -149,12 +151,12 @@ def generate_dataset():
     # Create an array of Vehicle objects
     sensors = [Sensor(sensor_id) for sensor_id in range(1, num_sensors + 1)]
 
-    sensors = sensor_presets(sensors)
+    sensors = sensor_presets(sensors, config)
 
     # Select a random sensor to stop reporting after 50 iterations
     #stopped_sensor_id = random.randint(1, len(sensors) )
     stopped_sensor_id = 5
-    stopped_iteration = random.randint(100,200)
+    stopped_iteration = random.randint(30,50)
 
     print("Starting to stream data to the Events API...")
 
@@ -171,9 +173,9 @@ def generate_dataset():
 
             # If the sensor is the randomly selected sensor and it has reached 50 iterations, stop it from reporting
             if i == stopped_iteration and sensor.id == stopped_sensor_id:
+                print(f"Sensor {stopped_sensor_id} stopped at {datetime.datetime.utcnow()}")
                 sensor.stopped = True
-    
-
+ 
 if __name__ == '__main__':
   
     generate_dataset()
