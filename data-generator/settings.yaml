@@ -1,27 +1,35 @@
 num_sensors: 10
+post_batch_size: 20
+sleep_seconds: 1                    #How long to pause between sensor value updates... 
 num_iterations: 1000000
 
 id_init_min: 1400
 id_init_max: 1600
 
-valid_min: 500
-valid_max: 2500
-percent_out_of_bounds: 0.05
-percent_out_of_bounds_high: 50
+valid_min: 400
+valid_max: 2000
+percent_out_of_bounds: 0.03
+percent_out_of_bounds_high: 100
 
 value_max: 3000
 value_min: 0
-value_max_normal_change: 1
+value_max_normal_change: 2
 
 step_min: 20
 step_max: 50
-percent_step: 0.03
+percent_step: 0.04
 percent_step_trend: 0.06
 
 sensor_overrides:
+    - id: 1
+      trend: null
+      initial_value: 1000
+      outliers: False
     - id: 2
       trend: 'up'
       initial_value: 600
+      outliers: False
     - id: 3
       trend: 'down'
-      initial_value: 2400  
+      initial_value: 1950  
+      outliers: False
