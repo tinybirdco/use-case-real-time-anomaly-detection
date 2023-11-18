@@ -1,0 +1,58 @@
+TOKEN "simple_z_score_read" READ
+
+NODE calculate_zscore
+DESCRIPTION >
+    Promote these to endpoint query parameters?
+
+SQL >
+
+    %
+    {% set _stats_time_window_minutes=10 %}
+    {% set _scan_for_anomality_window_minutes=10 %}
+    {% set _zscore_outlier_multiplier=2 %}
+
+    WITH stats AS (
+        SELECT id,
+            avg(value) AS average,
+            stddevPop(value) AS stddev
+        FROM incoming_data
+        WHERE timestamp between now() - interval {{Int16(_stats_time_window_minutes)}} minute and now()
+           {% if defined(sensor_id) %}               
+              AND id = {{ Int32(sensor_id)}}
+           {% end %}  
+        GROUP BY id  
+    )
+    SELECT i.timestamp, 
+         i.id, 
+         i.value, 
+         (i.value - stats.average)/stats.stddev AS zscore,
+         stats.average,
+         stats.stddev,
+         {{Int16(_zscore_outlier_multiplier)}} AS zscore_multiplier
+    FROM incoming_data i
+    JOIN stats s ON s.id = i.id
+    WHERE timestamp BETWEEN now() - interval {{Int16(_scan_for_anomality_window_minutes)}} minute AND now()
+    ORDER BY timestamp DESC
+
+
+
+NODE endpoint
+SQL >
+
+    %
+    SELECT timestamp,
+       id,
+       value,
+       zscore,
+       Round(zscore,2) AS zscore,
+       multiIf(zscore < (-1 * zscore_multiplier), 'low', zscore > zscore_multiplier, 'high','ok') AS test,
+       average,
+       stddev,
+       zscore_multiplier
+    FROM calculate_zscore
+    WHERE test = 'low' OR test = 'high' 
+     AND zscore < -1 * zscore_multiplier OR zscore > zscore_multiplier 
+    ORDER by timestamp DESC
+
+
+
