@@ -1,6 +1,13 @@
+DESCRIPTION >
+	Identify any sensors that have not reported in a specified amount of seconds.
+
+
 TOKEN "timeout_read" READ
 
 NODE get_most_recent
+DESCRIPTION >
+    Compile the most recent reports from all sensors.
+
 SQL >
 
     WITH RankedData AS (
@@ -24,6 +31,11 @@ SQL >
 
 
 NODE endpoint
+DESCRIPTION >
+    Determine if any sensors have not reported in the specified time window.
+
+    Next: add a timeout_seconds request parameter.
+
 SQL >
 
     %

@@ -1,3 +1,7 @@
+DESCRIPTION >
+	Returns the most recent data for each sensor.
+
+
 TOKEN "most_recent_read" READ
 
 NODE endpoint
@@ -20,6 +24,7 @@ SQL >
         RankedData
     WHERE
         row_num = 1
+    ORDER BY id ASC
 
 
 
