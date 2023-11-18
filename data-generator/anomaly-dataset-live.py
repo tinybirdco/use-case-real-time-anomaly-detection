@@ -1,6 +1,7 @@
 import requests
 import random
 import datetime
+import time
 import os
 import json
 import yaml
@@ -14,6 +15,8 @@ with open('./data-generator/settings.yaml') as file:
     config = yaml.safe_load(file)
 
 num_sensors = config['num_sensors']
+sleep_seconds = config['sleep_seconds']
+post_batch_size = config['post_batch_size']
 num_iterations = config['num_iterations']
 id_init_min = config['id_init_min']
 id_init_max = config['id_init_max']
@@ -38,6 +41,7 @@ tinybird_url = "https://api.tinybird.co/v0/events?name=incoming_data"
 tinybird_token = os.environ.get('TINYBIRD_TOKEN')
 headers = {"Authorization": f"Bearer {tinybird_token}", "Content-Type": "application/json"}
 
+
 class Sensor:
     def __init__(self, sensor_id):
         self.id = sensor_id
@@ -56,10 +60,10 @@ class Sensor:
         self.trend = None # 'up', 'down'
 
         # Validation metadata
+        self.outliers = True
         self.valid_min = valid_min
         self.valid_max = valid_max
-        
-   
+           
     def generate_new_value(self):
 
         value = self.value
@@ -68,12 +72,13 @@ class Sensor:
             value = self.previous_value
 
         # For some small percentage, generate a out-of-bounds value
-        if random.uniform(0,100) < percent_out_of_bounds:
-            if random.uniform(0,100) < percent_out_of_bounds_high:
+        if self.outliers and random.uniform(0,100) < percent_out_of_bounds:
+            if random.uniform(0,100) < (100 - percent_out_of_bounds_high):
                 value = random.uniform(value_min,self.valid_min-20)
             else:
                 value = random.uniform(self.valid_max+20, value_max)
             return value    
+        
         else: #Generate a new value
 
             # For some small percentage, generate a step change
@@ -114,8 +119,12 @@ class Sensor:
         self.report['id'] = self.id # Need to send sensor ID. 
         self.report['value'] = round(self.value,2)
 
-        report_json = json.dumps(self.report)
-        response = requests.post(tinybird_url, headers=headers, data=report_json)
+        self.reports.append(self.report)
+
+        #report_json = json.dumps(self.report)
+        #response = requests.post(tinybird_url, headers=headers, data=report_json)
+
+        return self.report
 
 def generate_timestamp():
     # Get the current datetime object
@@ -127,11 +136,13 @@ def generate_timestamp():
 
 def sensor_presets(sensors, config):
     for sensor_data in config['sensor_overrides']:
-        id = sensor_data['id']
+        id = sensor_data['id'] - 1
         trend = sensor_data['trend']
         initial_value = sensor_data['initial_value']
+        outliers = sensor_data['outliers']
 
         sensors[id].trend = trend
+        sensors[id].outliers = outliers
         sensors[id].value = initial_value
         sensors[id].initial_value = initial_value
         sensors[id].previous_value = initial_value
@@ -143,11 +154,21 @@ def sensor_presets(sensors, config):
 
     return sensors
 
+def assemble_payload(reports):
+    pass
+    payload = ''
+    for report in reports:
+        json_string = json.dumps(report)
+        payload += json_string + '\n'
+
+    return payload
+
 def generate_dataset():
   
     # Create sensor objects.
     print(f"Creating {num_sensors} sensors.")
     sensors = []
+    reports = []
     # Create an array of Vehicle objects
     sensors = [Sensor(sensor_id) for sensor_id in range(1, num_sensors + 1)]
 
@@ -156,25 +177,44 @@ def generate_dataset():
     # Select a random sensor to stop reporting after 50 iterations
     #stopped_sensor_id = random.randint(1, len(sensors) )
     stopped_sensor_id = 5
-    stopped_iteration = random.randint(30,50)
+    stopped_iteration = random.randint(100,150)
 
     print("Starting to stream data to the Events API...")
 
+    batched_reports = 0
     # March through the configured iterations... 
     for i in range(num_iterations):
+        time.sleep(sleep_seconds)
         for sensor in sensors:    
-            # print(f"Generating new sample for sensor {sensor.id}")
+            print(f"Generating new sample for sensor {sensor.id}")
             if sensor.stopped:
                 # print(f"Sensor {sensor.id} has stopped reporting.")
                 # TODO: May want mechanism for a sensor to restart. 
                 pass
             else:    
-                sensor.generate_new_report()
+                report = sensor.generate_new_report()
+                reports.append(report)
+                batched_reports = batched_reports + 1
 
             # If the sensor is the randomly selected sensor and it has reached 50 iterations, stop it from reporting
             if i == stopped_iteration and sensor.id == stopped_sensor_id:
                 print(f"Sensor {stopped_sensor_id} stopped at {datetime.datetime.utcnow()}")
                 sensor.stopped = True
+
+            if batched_reports >= post_batch_size:
+                print(f"Sending {len(reports)} to Events API")
+                reports_json = assemble_payload(reports)
+                #reports_json = json.dumps(sensor.reports)
+                response = requests.post(tinybird_url, headers=headers, data=reports_json)
+                status_code = response.status_code
+                
+                if status_code >= 200 and status_code <= 202:
+                    reports = []
+                    sensor.reports = []
+                    batched_reports = 0
+                else:
+                    print(f"Events request error: {response.status_code} : {response.reason}")    
+
  
 if __name__ == '__main__':
   
