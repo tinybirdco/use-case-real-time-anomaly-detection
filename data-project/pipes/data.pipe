@@ -1,3 +1,7 @@
+DESCRIPTION >
+	This endpoint responds with sensor data created with this [data generator](https://github.com/tinybirdco/anomaly-detection/blob/main/data-generator/anomaly-dataset-live.py).
+
+
 TOKEN "data_endpoint" READ
 
 NODE endpoint

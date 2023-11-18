@@ -6,8 +6,8 @@ SQL >
     %
         SELECT 
             id,
-            sum(value) value,
-            toStartOfInterval(timestamp, INTERVAL {{Int32(interval_duration, 10)}} second) date
+            sum(value) AS value_sum,
+            toStartOfInterval(timestamp, INTERVAL {{Int32(interval_duration, 10)}} seconds) AS date
         FROM
             incoming_data
         WHERE
@@ -25,13 +25,13 @@ SQL >
     %
         SELECT 
         id, 
-        ROUND(avg(value), 2) avg_value,
-        ROUND(stddevPop(value),2) std
+        ROUND(avg(value_sum), 2) avg_value_sum,
+        ROUND(stddevPop(value_sum),2) std
         FROM (
             with (
-              SELECT (avg(value), stddevPop(value)) std 
+              SELECT (avg(value_sum), stddevPop(value_sum)) std 
               FROM context) as ss
-            SELECT * FROM context WHERE value < ss.1 + 1.5 * ss.2
+            SELECT * FROM context WHERE value_sum < ss.1 + 1.5 * ss.2
         )
         GROUP BY id
 
@@ -44,14 +44,14 @@ SQL >
         SELECT
             date, 
             id, 
-            (value - avg_value) / std as zscore,
-            value,
-            multiIf(value == 0, 'error', zscore < -1 * {{Float32(zscore, 2)}}, 'error', 'ok') anomaly_low,
-            multiIf(value == 0, 'error', zscore > {{Float32(zscore, 2)}}, 'error', 'ok') anomaly_high
+            (value_sum - avg_value_sum) / std as zscore,
+            value_sum,
+            multiIf(value_sum == 0, 'error', zscore < -1 * {{Float32(zscore, 2)}}, 'error', 'ok') anomaly_low,
+            multiIf(value_sum == 0, 'error', zscore > {{Float32(zscore, 2)}}, 'error', 'ok') anomaly_high
         FROM (
           SELECT
             id,
-            avg(value) value,
+            avg(value_sum) value_sum,
             date
           FROM context
           WHERE

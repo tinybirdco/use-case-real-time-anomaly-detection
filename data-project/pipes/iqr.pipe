@@ -1,10 +1,25 @@
 DESCRIPTION >
-	TBD, getting worked out on the Playground.
+	This Pipe uses the [Interquartile Range (IQR)](https://en.wikipedia.org/wiki/Interquartile_range) to identify anomalies.
+
+IQR is based on calculating the lower (first) and upper (fourth) quartiles, and then matching on data outside of that range.
+
+The IQR = (upper quartile - lower quartile) * 1.5
+
+Data are identified as outliers if they are less than [lower quartile - IQR] or greater than [upper quartile + IQR].
+
+Calculation of the IQR is based on a time window of data (here we are defaulting to a 10-minute window).
 
 
 TOKEN "iqr_read" READ
 
 NODE get_stats
+DESCRIPTION >
+    Based on a time window (defaulting here to a 10-minute window), calculate the lower quartile, the medium, and the upper quartile. The IQR is then set to (uper quartile - lower quartile) * 1.5.
+
+    Based on the IQR, lower and upper bounds are set for determining data outliers:
+    * lower bound = lower quartile - IQR
+    * upper bound = upper quartile - IQR
+
 SQL >
 
     %
@@ -17,6 +32,9 @@ SQL >
     (upper_quartile - lower_quartile) * 1.5 AS IQR
     FROM incoming_data
     WHERE timestamp >= toDate(now()) - interval {{Int16(_time_window_minutes)}} minutes
+      {% if defined(sensor_id) %}               
+        AND id = {{ Int32(sensor_id)}}
+      {% end %}    
     GROUP BY id
     LIMIT 10
     )
@@ -36,6 +54,9 @@ SQL >
 
 
 NODE endpoint
+DESCRIPTION >
+    Selects the most recent IQR-based outlier for each sensor.
+
 SQL >
 
     WITH RankedData AS (

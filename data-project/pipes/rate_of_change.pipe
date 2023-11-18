@@ -1,35 +1,64 @@
 DESCRIPTION >
-	Not finished... need rate of change...
+	Calculates the rate-of-change, or slope, between the most recent data point and the previous points.
 
+This relies on the ClickHouse `lagInFrame` function.
+
+Key detail seems to be in this window function detail:
+`(PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) `
+
+
+TOKEN "rate_of_change_read" READ
 
 NODE calculating_slope
+DESCRIPTION >
+    Calculates the slope between the most recent data and the previous data.
+
 SQL >
 
     %
-    {% set _time_window_minutes=5 %}
+    {% set _time_window_minutes=30 %}
+    {% set _max_slope=1 %}
 
     SELECT id, 
     timestamp, 
+    previous_timestamp,
+    (value - previous_value) / (timestamp - previous_timestamp) as slope,
     value, 
+    previous_value,
+    (value - previous_value) as value_diff,
+    (timestamp - previous_timestamp) as time_diff,
+    {{Int16(_max_slope)}} as max_slope,
     lagInFrame(timestamp, 1) OVER 
-    (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS previous_timestamp, 
-    timestamp AS current_timestamp,
+    (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_timestamp, 
     lagInFrame(value, 1) 
-    OVER (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW) AS previous_value, 
-    value AS current_value,
-    (current_value - previous_value) / (current_timestamp - previous_timestamp) as slope
+    OVER (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_value,
+    {{Int16(_max_slope)}} as max_slope
     FROM incoming_data
     WHERE timestamp > now() - interval {{Int8(_time_window_minutes)}} minute
+      {% if defined(sensor_id) %}               
+        AND id = {{ Int32(sensor_id)}}
+      {% end %}    
     ORDER BY timestamp DESC
 
 
 
 
-NODE rate_of_change_1
+NODE endpoint
+DESCRIPTION >
+    Select rate-of-changes/slopes above the max.
+
 SQL >
 
-    SELECT id, timestamp, slope, previous_value, value 
+    SELECT id, 
+      timestamp, 
+      Round(slope,2) as slope, 
+      Round(value_diff,2) as value_diff, 
+      time_diff, 
+      previous_value, 
+      value, 
+      max_slope 
     FROM calculating_slope
-    WHERE slope > 1
+    WHERE ABS(slope) > max_slope
+    ORDER BY timestamp DESC
 
 
