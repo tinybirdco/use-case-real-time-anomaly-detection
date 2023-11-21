@@ -39,9 +39,7 @@ DESCRIPTION >
 SQL >
 
     %
-    {% set _time_window_seconds=10 %}
-
     SELECT * FROM get_most_recent
-    WHERE timestamp < NOW() - INTERVAL {{Int16(_time_window_seconds)}} SECONDS
+    WHERE timestamp < NOW() - INTERVAL {{Int16(seconds,10,description="If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'.")}} SECONDS
 
 

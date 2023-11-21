@@ -4,6 +4,8 @@ NODE context
 SQL >
 
     %
+    {% set _stats_time_window_minutes=10 %}
+
         SELECT 
             id,
             sum(value) AS value_sum,
@@ -11,7 +13,7 @@ SQL >
         FROM
             incoming_data
         WHERE
-            timestamp between now() - interval {{Int32(minutes, 30)}} minute and now()
+            timestamp between now() - interval {{Int32(_stats_time_window_minutes, 30)}} minute and now()
         GROUP BY
             date, id
         ORDER BY
