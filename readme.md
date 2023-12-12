@@ -1,5 +1,4 @@
 
-
 ## Anomaly detection 
 
 This project is a collection of things in support of demonstrating how Tinybird can be used to detect anomalies and support anomaly-detection systems. 
@@ -15,28 +14,20 @@ The main pieces of this project are:
 ## Anomaly types
 This project includes Tinybird Pipe 'recipes' that implement the following methods for detecting anomalies: 
 
-* Data that lies outside of a specified 'valid' range.
-* Data with rates-of-change above a specified rate or slope.
-* Data that stops completely.
-* Data outliers due to being outside of Interquartile Range (IQR) lower and upper bounds.
-* Data outliers due to its Z-Score.  
+* **Out-of-range**: Data that lies outside of a specified 'valid' range.
+* **Rate-of-change**: Data with rates-of-change above a specified rate or slope.
+* **Timeout**: Data that stops completely.
+* Pattern changing. These methods develop data statistics to detect anomalies:
+  * **Interquartile Range (IQR)**: Data outliers due to being outside of IQR lower and upper bounds.
+  * **Z-score**: Data outliers due to its Z-Score.  
 
 ## Generating time-series data
 
-The first step is building some tools for generating time-series data with anomalies and outliers in it. The core of this tool will generate a time-series with the following features:
+For this project, a first step was building tools for generating time-series data with prescribed anomalies and outliers in it. These tools generate a time-series with the following features:
 * Steady-state values with small random fluctuations.
 * Random and isolated outliers that are outside of a "valid" range.  
 * Step-functions where the data jumps upwards and downwards. Here the slope between points is an anomaly.
-* Sensors that stop reporting (and so far without any restarting behavior.
-
-
-### Anomaly types
-
-This tool generates time-series data with these outliers and anomalies: 
-
-* Value outliers. Any value outside of a valid range. 
-* Out-of-bounds slopes and Step functions, positive and negation. 
-* Sensor data stopping.
+* Sensors that stop reporting.
 
 ### Data generation 
 
