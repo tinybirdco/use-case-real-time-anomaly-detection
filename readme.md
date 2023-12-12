@@ -29,38 +29,6 @@ The first step is building some tools for generating time-series data with anoma
 * Step-functions where the data jumps upwards and downwards. Here the slope between points is an anomaly.
 * Sensors that stop reporting (and so far without any restarting behavior.
 
-### Configuring the data generator
-
-The following settings are set in a `settings.yaml` file:
-```
-num_sensors: 10
-num_iterations: 1000000
-
-id_init_min: 1400
-id_init_max: 1600
-
-valid_min: 500
-valid_max: 2500
-percent_out_of_bounds: 0.05
-percent_out_of_bounds_high: 50
-
-value_max: 3000
-value_min: 0
-value_max_normal_change: 1
-
-step_min: 20
-step_max: 50
-percent_step: 0.03
-percent_step_trend: 0.06
-
-sensor_overrides:
-    - id: 2
-      trend: 'up'
-      initial_value: 600
-    - id: 3
-      trend: 'down'
-      initial_value: 2400  
-```
 
 ### Anomaly types
 
