@@ -4,6 +4,29 @@ With data set files, we will be able to curate datasets with anomaly artifacts t
 
 Started with a script that generates and writes data set files. Now refactoring to generate a real-time time-series, using the same "data with anomalies" design, but instead posting the data to the Events API. 
 
+### Data generation 
+
+Kicking off the project with a set of data generator tools. These tools generate single-value time-series data for a set of sensors. Data from the sensors are emitted on a configured interval.
+
+See the [the data-generator readme](./data-generator/readme.md) for more details.
+
+### Trend types
+
+Sensors can be seeded with a *trend* setting. 
+
+#### No trend
+
+![No trending](../charts/no-trend.png)
+
+#### Trend up
+
+![Trending up](.,/charts/trend-up.png)
+
+#### Trend down
+
+![Trending down](../charts/trend-down.png)
+
+
 ### Configuring the data generator
 
 The following settings are set in a `settings.yaml` file:
