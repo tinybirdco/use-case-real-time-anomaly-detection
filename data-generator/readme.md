@@ -4,7 +4,47 @@ With data set files, we will be able to curate datasets with anomaly artifacts t
 
 Started with a script that generates and writes data set files. Now refactoring to generate a real-time time-series, using the same "data with anomalies" design, but instead posting the data to the Events API. 
 
-## anomaly-dataset-to-file.py
+### Configuring the data generator
+
+The following settings are set in a `settings.yaml` file:
+```
+num_sensors: 10
+num_iterations: 1000000
+
+id_init_min: 1400
+id_init_max: 1600
+
+valid_min: 500
+valid_max: 2500
+percent_out_of_bounds: 0.05
+percent_out_of_bounds_high: 50
+
+value_max: 3000
+value_min: 0
+value_max_normal_change: 1
+
+step_min: 20
+step_max: 50
+percent_step: 0.03
+percent_step_trend: 0.06
+
+sensor_overrides:
+    - id: 2
+      trend: 'up'
+      initial_value: 600
+    - id: 3
+      trend: 'down'
+      initial_value: 2400  
+```
+
+
+### anomaly-dataset-live.py
+
+Posts each new report to the Events API. No longer using synthetic timestamps and now everything is NowUTC(). 
+
+If this POC evolves, these two script could share common "generate data with anomalies" code. 
+
+### anomaly-dataset-to-file.py
 
 Builds CSV files that look like this: 
 
@@ -23,11 +63,6 @@ Timestamp,sensor 1,sensor 2,sensor 3,sensor 4,sensor 5,sensor 6,sensor 7,sensor 
 2023-11-02 16:55:26.0,541.8,569.32,199.54,699.53,591.86,685.17,496.55,635.26,470.58,599.07
 ```
 
-## anomaly-dataset-live.py
-
-Posts each new report to the Events API. No longer using synthetic timestamps and now everything is Now(). 
-
-If this POC evolves, these two script could share common "generate data with anomalies" code. 
 
 ### Trend types
 
