@@ -1,0 +1,51 @@
+DESCRIPTION >
+	Identify any sensors that have not reported in a specified amount of seconds.
+
+
+TOKEN "scheduled_copy_t_6630fdc1df7c431289fe1fb310c563b7" READ
+
+NODE get_most_recent
+DESCRIPTION >
+    Compile the most recent reports from all sensors.
+
+SQL >
+
+    WITH RankedData AS (
+        SELECT
+            id,
+            timestamp,
+            value,
+            ROW_NUMBER() OVER (PARTITION BY id ORDER BY timestamp DESC) AS row_num
+        FROM
+            incoming_data
+    )
+    SELECT
+        id,
+        timestamp,
+        value
+    FROM
+        RankedData
+    WHERE
+        row_num = 1
+
+
+
+NODE log
+DESCRIPTION >
+    Determine if any sensors have not reported in the specified time window.
+
+    Next: add a timeout_seconds request parameter.
+
+SQL >
+
+    SELECT id, timestamp, value,
+    'timeout' AS anomaly_type,
+    'timestamp is time of last report' AS note
+    FROM get_most_recent
+    WHERE timestamp < NOW() - INTERVAL 10 SECONDS
+
+TYPE copy
+TARGET_DATASOURCE copy_log
+COPY_SCHEDULE * * * * *
+
+
