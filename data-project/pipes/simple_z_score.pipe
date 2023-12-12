@@ -14,7 +14,7 @@ These parameters, along with the `_zscore_outlier_multiplier` setting, could be 
 
 TOKEN "simple_z_score_read" READ
 
-NODE calculate_zscore
+NODE calculate_z_score
 DESCRIPTION >
     Promote these to endpoint query parameters?
 
@@ -23,7 +23,6 @@ SQL >
     %
     {% set _stats_time_window_minutes=10 %}
     {% set _anomaly_scan_time_window_seconds=30 %}
-    {% set _zscore_outlier_multiplier=2 %}
 
     WITH stats AS (
         SELECT id,
@@ -42,7 +41,7 @@ SQL >
          (i.value - stats.average)/stats.stddev AS zscore,
          stats.average,
          stats.stddev,
-         {{Int16(_zscore_outlier_multiplier)}} AS zscore_multiplier
+         {{Int16(zscore_multiplier, 2, description="Z-Score multipler to identify anomalies.")}} AS zscore_multiplier
     FROM incoming_data i
     JOIN stats s ON s.id = i.id
     WHERE timestamp BETWEEN now() - interval {{Int16(_anomaly_scan_time_window_seconds)}} second AND now()
@@ -62,7 +61,7 @@ SQL >
        Round(average,2),
        stddev,
        zscore_multiplier
-    FROM calculate_zscore
+    FROM calculate_z_score
     WHERE test = 'low' OR test = 'high' 
      AND zscore < -1 * zscore_multiplier OR zscore > zscore_multiplier 
     ORDER by timestamp DESC

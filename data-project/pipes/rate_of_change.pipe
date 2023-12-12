@@ -16,8 +16,8 @@ DESCRIPTION >
 SQL >
 
     %
-    {% set _time_window_minutes=30 %}
-    {% set _max_slope=1 %}
+    {% set time_window_minutes=30 %}
+    {% set max_slope=3 %}
 
     SELECT id, 
     timestamp, 
@@ -27,14 +27,13 @@ SQL >
     previous_value,
     (value - previous_value) as value_diff,
     (timestamp - previous_timestamp) as time_diff,
-    {{Int16(_max_slope)}} as max_slope,
+    {{Int16(max_slope, 3, description="Integer. Maximum slope, any higher than this are returned.")}} as max_slope,
     lagInFrame(timestamp, 1) OVER 
     (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_timestamp, 
     lagInFrame(value, 1) 
-    OVER (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_value,
-    {{Int16(_max_slope)}} as max_slope
+    OVER (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_value
     FROM incoming_data
-    WHERE timestamp > now() - interval {{Int8(_time_window_minutes)}} minute
+    WHERE timestamp > NOW() - INTERVAL {{Int8(time_window_minutes, 30, description="Search this many most recent minutes of the data history.")}} MINUTE
       {% if defined(sensor_id) %}               
         AND id = {{ Int32(sensor_id)}}
       {% end %}    
@@ -60,5 +59,12 @@ SQL >
     FROM calculating_slope
     WHERE ABS(slope) > max_slope
     ORDER BY timestamp DESC
+
+
+
+NODE rate_of_change_2
+SQL >
+
+    SELECT * FROM endpoint
 
 

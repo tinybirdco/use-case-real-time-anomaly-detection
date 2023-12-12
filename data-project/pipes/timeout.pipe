@@ -10,6 +10,7 @@ DESCRIPTION >
 
 SQL >
 
+    %
     WITH RankedData AS (
         SELECT
             id,
@@ -18,6 +19,7 @@ SQL >
             ROW_NUMBER() OVER (PARTITION BY id ORDER BY timestamp DESC) AS row_num
         FROM
             incoming_data
+         WHERE timestamp > NOW() - interval {{Int16(time_window_minutes, 10, description="Results will be based on this number of minutes of data history. ")}} MINUTE
     )
     SELECT
         id,
@@ -41,5 +43,15 @@ SQL >
     %
     SELECT * FROM get_most_recent
     WHERE timestamp < NOW() - INTERVAL {{Int16(seconds,10,description="If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'.")}} SECONDS
+       {% if defined(sensor_id) %}               
+          AND id = {{ Int32(sensor_id)}}
+       {% end %}  
+
+
+
+NODE timeout_2
+SQL >
+
+    SELECT * FROM endpoint
 
 
