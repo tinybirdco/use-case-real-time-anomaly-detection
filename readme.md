@@ -39,7 +39,9 @@ The `anomaly-detection` Data Project includes two Data Sources and over a dozen 
 * incoming_data
 * copy_log
 
-### /pipes for anomaly detection
+### /pipes 
+
+##### Anomaly detection recipes
 Rougly in the order of complexity, starting with the more simple: 
 * timeout
 * out_of_range
