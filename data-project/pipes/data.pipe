@@ -18,7 +18,8 @@ SQL >
          AND id = {{ Int16(sensor_id,description='Sensor ID to return.')}}
       {% end %}
       AND toDateTime(timestamp) BETWEEN addDays(now(),-1) AND now()
-    ORDER BY timestamp ASC
+    ORDER BY timestamp DESC
+    LIMIT {{ Int32(max_results, 1000, description="The maximum number of data objects to return per response.") }}
 
 
 

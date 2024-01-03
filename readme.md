@@ -1,11 +1,11 @@
 
 ## Anomaly detection 
 
-This project is a collection of things in support of demonstrating how Tinybird can be used to detect anomalies and support anomaly-detection systems. 
+This project is a collection of content in support of demonstrating how Tinybird can be used to detect anomalies and support anomaly-detection systems. 
 
 The main pieces of this project are:
-* A **data generator** that emits time-series data with outliers and anomalies.
-* A **Tinybird Data Project** with Pipes that implement different recipes to detect outliers and anomalies.
+* A **data generator** that emits time-series data with outliers and anomalies. With this script you can curate data with prescibed outliers and trends.  See [HERE](./data-generator/readme.md) for more details. 
+* A **Tinybird Data Project** with Pipes that implement different recipes to detect outliers and anomalies. It also provides Data Source definitions, including their data schema and database details. 
 * A **Grafana dashboard** that displays the time-series data along with anomaly detection summaries. 
 
 ![Anomaly detection dashboard](./charts/dashboard-poc.png)
@@ -17,9 +17,10 @@ This project includes Tinybird Pipe 'recipes' that implement the following metho
 * **Out-of-range**: Data that lies outside of a specified 'valid' range.
 * **Rate-of-change**: Data with rates-of-change above a specified rate or slope.
 * **Timeout**: Data that stops completely.
-* Pattern changing. These methods develop data statistics to detect anomalies:
-  * **Interquartile Range (IQR)**: Data outliers due to being outside of IQR lower and upper bounds.
-  * **Z-score**: Data outliers due to its Z-Score.  
+* **Statistical outliers**: These methods generate time-series statistics to identify *pattern* changes, rather than triggering on a single, isolated data point:
+
+  * **Interquartile Range (IQR)**: Data outliers due to being outside of IQR lower and upper bounds. {}
+  * **Z-score**: Data outliers due to its Z-Score. {} 
 
 ## Generating time-series data
 
@@ -36,20 +37,24 @@ Kicking off the project with a set of data generator tools. These tools generate
 The `anomaly-detection` Data Project includes two Data Sources and over a dozen Pipes. 
 
 ### /datasources
-* incoming_data
-* copy_log
+* incoming_data - where the ingested data is written to. 
+* copy_log - stores a compilation of anomaly detections. 
 
 ### /pipes 
 
-##### Anomaly detection recipes
-Rougly in the order of complexity, starting with the more simple: 
-* timeout
-* out_of_range
-* rate_of_change
-* iqr
-* z_score
+There are two Pipes for each of the five anomaly types. One set provides 'recipes' for creating API Endpoints for each detection technique. The other set are `Copy Pipes` that apply the same queries and write output to a shared `copy_log`. 
 
-#### Copy Pipes
+The `get_anomalies` Pipe provides an API Endpoint for querying the triggered anomalies log. This makes it possible to query a single endpoint and receive results from all five detection methods.  
+
+## Anomaly detection recipes
+
+* **out_of_range** - Compares data with a set maximum and minimum values. This recipe works with individual data points, and uses the most simple queries.  
+* **timeout** - Finds the most recent report for each sensor and checks if it is within the 'timeout' window.  
+* **rate_of_change** - Looks up the two most recent data points and determines the rate of change, or slope, and compares that to a maximax allowable slope.  
+* **iqr** - Generates a `IQR` range based on first and fourth quartiles and a multipler and used to define an 'acceptable' range. 
+* **z_score** - Generates a `Z score` based on data averages and standard deviations, with all scores above a threshold identified as anomalies.  
+
+### Copy Pipes
 
 These Copy Pipes are based on the anomaly detection Pipes. Their Job is to test for anomalies across all sensors and write output to the `copy_log` Data Source. These Copy Pipes do the work of compiling their detections into a single place. 
 
@@ -65,7 +70,7 @@ AND timestamp > NOW() - INTERVAL 30 MINUTE
 ```
 Here we are adding `min_value` and `max_value` to the SELECT statement to pass them to a subsequent Node that records these values in a `note` column. 
 
-#### Compiling detections into a single source  
+### Compiling detections into a single source  
 
 The `monitor_logs` API Endpoint pulls from the `copy_log` Data Source that is fed by the Copy Pipes, which get triggered every few minutes. The endpoint returns a list of anomaly detections across the set of sensors for all the anomaly types.  
 

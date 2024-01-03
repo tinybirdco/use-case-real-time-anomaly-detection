@@ -1,0 +1,58 @@
+DESCRIPTION >
+	A simple Pipe that finds threshold, or out-of-range, outliers.
+
+
+NODE select_outliers
+DESCRIPTION >
+    Tests each data in the time window against a maximum and minimum value.
+
+    {% set _max_value=2000 %} 
+    {% set _min_value=200 %}
+    {% set _time_window_minutes=30 %}
+
+    Materialized views do not support parameters.
+
+SQL >
+
+    %
+
+    SELECT *, 200 AS min_value, 2000 AS max_value 
+    FROM incoming_data
+    WHERE (value < 200 OR value > 2000)
+    AND timestamp > now() - interval 30 minute
+
+
+
+NODE log
+SQL >
+
+    WITH RankedData AS (
+        SELECT
+            id,
+            timestamp,
+            value,
+            ROW_NUMBER() OVER (PARTITION BY id ORDER BY timestamp DESC) AS row_num,
+            min_value,
+            max_value
+        FROM
+            select_outliers
+    )
+    SELECT
+        id,
+        timestamp,
+        value,
+        'out-of-range' AS anomaly_type,
+        concat('min:', toString(min_value),' max:', toString(max_value)) AS note
+    
+    FROM
+        RankedData
+    WHERE
+        row_num = 1
+    ORDER BY timestamp DESC
+
+TYPE materialized
+DATASOURCE log_mv
+ENGINE "MergeTree"
+ENGINE_PARTITION_KEY "toYYYYMM(timestamp)"
+ENGINE_SORTING_KEY "timestamp, id"
+
