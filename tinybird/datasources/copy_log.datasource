@@ -1,0 +1,10 @@
+SCHEMA >
+    `id` Int16,
+    `timestamp` DateTime,
+    `value` Float32,
+    `anomaly_type` String,
+    `note` String
+
+ENGINE MergeTree
+ENGINE_PARTITION_KEY toYear(timestamp)
+ENGINE_SORTING_KEY timestamp, id, anomaly_type, note

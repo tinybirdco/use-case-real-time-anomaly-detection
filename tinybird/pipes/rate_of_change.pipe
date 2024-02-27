@@ -1,0 +1,70 @@
+DESCRIPTION >
+	Calculates the rate-of-change, or slope, between the most recent data point and the previous points.
+
+This relies on the ClickHouse `lagInFrame` function.
+
+Key detail seems to be in this window function detail:
+`(PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) `
+
+
+TOKEN "rate_of_change_read" READ
+
+NODE calculating_slope
+DESCRIPTION >
+    Calculates the slope between the most recent data and the previous data.
+
+SQL >
+
+    %
+    {% set time_window_minutes=30 %}
+    {% set max_slope=3 %}
+
+    SELECT id, 
+    timestamp, 
+    previous_timestamp,
+    (value - previous_value) / (timestamp - previous_timestamp) as slope,
+    value, 
+    previous_value,
+    (value - previous_value) as value_diff,
+    (timestamp - previous_timestamp) as time_diff,
+    {{Int16(max_slope, 3, description="Integer. Maximum slope, any higher than this are returned.")}} as max_slope,
+    lagInFrame(timestamp, 1) OVER 
+    (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_timestamp, 
+    lagInFrame(value, 1) 
+    OVER (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_value
+    FROM incoming_data
+    WHERE timestamp > NOW() - INTERVAL {{Int8(time_window_minutes, 30, description="Search this many most recent minutes of the data history.")}} MINUTE
+      {% if defined(sensor_id) %}               
+        AND id = {{ Int32(sensor_id)}}
+      {% end %}    
+    ORDER BY timestamp DESC
+
+
+
+
+NODE endpoint
+DESCRIPTION >
+    Select rate-of-changes/slopes above the max.
+
+SQL >
+
+    SELECT id, 
+      timestamp, 
+      Round(slope,2) as slope, 
+      Round(value_diff,2) as value_diff, 
+      time_diff, 
+      previous_value, 
+      value, 
+      max_slope 
+    FROM calculating_slope
+    WHERE ABS(slope) > max_slope
+    ORDER BY timestamp DESC
+
+
+
+NODE rate_of_change_2
+SQL >
+
+    SELECT * FROM endpoint
+
+

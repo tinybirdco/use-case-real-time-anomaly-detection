@@ -1,0 +1,79 @@
+DESCRIPTION >
+    This Copy Pipe tests for `interquartile range` anomalies across all sensors and writes output to the `copy_log` Data Source. These Copy Pipes do the work of compiling their detections into a single place.
+    These Copy Pipes do not support query parameters so some details are hardcoded in the SQL. For example, this Copy Pipe hardcodes that the IQR is based on a `1.5` multiplier, and uses a 10-minute window for developing stats.
+    Based on the `iqr` Pipe that uses the [Interquartile Range (IQR)](https://en.wikipedia.org/wiki/Interquartile_range) to identify anomalies.
+    IQR is based on calculating the lower (first) and upper (fourth) quartiles, and then matching on data outside of that range.
+    The IQR = (upper quartile - lower quartile) * 1.5
+    Data are identified as outliers if they are less than [lower quartile - IQR] or greater than [upper quartile + IQR].
+    Calculation of the IQR is based on a time window of data (here we are defaulting to a 10-minute window).
+
+TOKEN "scheduled_copy_iqr" READ
+
+NODE get_stats
+DESCRIPTION >
+    Based on a time window (defaulting here to a 10-minute window), calculate the lower quartile, the medium, and the upper quartile. The IQR is then set to (uper quartile - lower quartile) * 1.5.
+    Based on the IQR, lower and upper bounds are set for determining data outliers:
+    * lower bound = lower quartile - IQR
+    * upper bound = upper quartile - IQR
+
+SQL >
+    WITH
+        stats AS (
+            SELECT
+                id,
+                quantileExact(0.25)
+                (value) AS lower_quartile,
+                quantileExact(0.5)
+                (value) AS mid_quartile,
+                quantileExact(0.75)
+                (value) AS upper_quartile,
+                (upper_quartile - lower_quartile) * 1.5 AS IQR
+            FROM incoming_data
+            WHERE timestamp >= toDate(NOW()) - INTERVAL 10 MINUTES
+            GROUP BY id
+            LIMIT 10
+        )
+    SELECT DISTINCT
+        timestamp,
+        id,
+        value,
+        ROUND((stats.lower_quartile - stats.IQR), 2) AS lower_bound,
+        ROUND((stats.upper_quartile + stats.IQR), 2) AS upper_bound
+    FROM incoming_data
+    JOIN stats ON incoming_data.id = stats.id
+    WHERE
+        timestamp >= toDate(NOW()) - INTERVAL 10 MINUTES
+        AND (value > (stats.upper_quartile + stats.IQR) OR value < (stats.lower_quartile - stats.IQR))
+    ORDER BY timestamp DESC
+
+NODE log
+DESCRIPTION >
+    Selects the most recent IQR-based outlier for each sensor.
+
+SQL >
+    WITH
+        RankedData AS (
+            SELECT
+                id,
+                timestamp,
+                value,
+                ROW_NUMBER() OVER (PARTITION BY id ORDER BY timestamp DESC) AS row_num,
+                lower_bound,
+                upper_bound
+            FROM get_stats
+        )
+    SELECT
+        id,
+        timestamp,
+        value,
+        'interquartile-range' AS anomaly_type,
+        concat(
+            'lower_bound:', toString(ROUND(lower_bound, 2)), '| upper_bound:', toString(upper_bound)
+        ) AS note
+    FROM RankedData
+    WHERE row_num = 1
+    ORDER BY timestamp DESC
+
+TYPE COPY
+TARGET_DATASOURCE copy_log
+COPY_SCHEDULE * * * * *

@@ -1,0 +1,66 @@
+DESCRIPTION >
+	This Copy Pipe test for `rate-of-change` anomalies across all sensors and write output to the `copy_log` Data Source. These Copy Pipes do the work of compiling their detections into a single place.
+
+These Copy Pipes do not support query parameters so some details are hardcoded in the SQL. For example, the `copy_rate_of_change` Pipe hardcodes the maximum (absolute value) allowable slope to `3`, and the time window to the most recent `30` minutes.
+
+Calculates the rate-of-change, or slope, between the most recent data point and the previous points.
+
+This relies on the ClickHouse `lagInFrame` function.
+
+Key detail seems to be in this window function detail:
+`(PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) `
+
+
+TOKEN "scheduled_copy_rate_of_change" READ
+
+NODE calculating_slope
+DESCRIPTION >
+    Calculates the slope between the most recent data and the previous data.
+
+SQL >
+
+    %
+
+    SELECT id, 
+    timestamp, 
+    previous_timestamp,
+    (value - previous_value) / (timestamp - previous_timestamp) AS slope,
+    value, 
+    previous_value,
+    (value - previous_value) AS value_diff,
+    (timestamp - previous_timestamp) AS time_diff,
+    3 AS max_slope,
+    lagInFrame(timestamp, 1) OVER 
+    (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_timestamp, 
+    lagInFrame(value, 1) 
+    OVER (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_value
+    FROM incoming_data
+    WHERE timestamp > NOW() - INTERVAL 30 MINUTE
+      {% if defined(sensor_id) %}               
+        AND id = {{ Int32(sensor_id)}}
+      {% end %}    
+    ORDER BY timestamp DESC
+
+
+
+
+NODE log
+DESCRIPTION >
+    Select rate-of-changes/slopes above the max.
+
+SQL >
+
+    SELECT id, 
+      timestamp, 
+      value,
+      'rate-of-change' AS anomaly_type,
+      concat('slope:', toString(ROUND(slope,2)), '| max_slope:', toString(max_slope), '| value_diff: ', toString(ROUND(value_diff,2))) AS note
+    FROM calculating_slope
+    WHERE ABS(slope) > max_slope
+    ORDER BY timestamp DESC
+
+TYPE copy
+TARGET_DATASOURCE copy_log
+COPY_SCHEDULE * * * * *
+
+

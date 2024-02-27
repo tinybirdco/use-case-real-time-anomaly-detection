@@ -1,0 +1,8 @@
+DESCRIPTION >
+    Used by dashboard to look up the available sensor IDs in order to populate a dropdown box.
+
+TOKEN "ui_ids_read" READ
+
+NODE endpoint
+SQL >
+    SELECT DISTINCT id FROM incoming_data ORDER BY id ASC

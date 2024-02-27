@@ -1,0 +1,22 @@
+DESCRIPTION >
+    The `monitor_logs` API Endpoint pulls from the `copy_log` Data Source that is fed by the Copy Pipes, which get triggered every few minutes. The endpoint returns a list of anomaly detections across the set of sensors for all the anomaly types.
+    While this compilation is not based on up-to-the-second fresh data, this endpoint provides a single endpoint that covers the five different anomaly types with a up-to-the-minute results.
+    https://api.tinybird.co/v0/pipes/monitor_logs.json
+
+TOKEN "monitor_logs_read" READ
+
+NODE endpoint
+SQL >
+    %
+    SELECT DISTINCT *
+    FROM copy_log
+    WHERE 1 = 1 {% if defined(sensor_id) %} AND id = {{ Int32(sensor_id) }} {% end %}
+    ORDER BY timestamp DESC
+    LIMIT
+        {{
+            Int32(
+                max_results,
+                100,
+                description="The maximum number of most recent anomalies to return per response.",
+            )
+        }}
