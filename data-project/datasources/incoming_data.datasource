@@ -1,9 +1,0 @@
-
-SCHEMA >
-    `id` Int16 `json:$.id`,
-    `timestamp` DateTime `json:$.timestamp`,
-    `value` Float32 `json:$.value`
-
-ENGINE "MergeTree"
-ENGINE_PARTITION_KEY "toYear(timestamp)"
-ENGINE_SORTING_KEY "timestamp, id"

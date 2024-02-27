@@ -1,9 +1,0 @@
-NODE count_things
-DESCRIPTION > Just a simple query as an example Pipe. 
-
-SQL > select count()
-  from daily_stats_mv 
-
-
-
-
