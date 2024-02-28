@@ -1,53 +1,49 @@
 DESCRIPTION >
-    A simple Pipe that finds threshold, or out-of-range, outliers.
-    This Copy Pipe test for `out-of-range` anomalies across all sensors and write output to the `copy_log` Data Source. These Copy Pipes do the work of compiling their detections into a single place.
-    These Copy Pipes do not support query parameters so some details are hardcoded in the SQL. For example, the copy_out_of_range Pipe hardcodes the minimum and maximum allowable thresholds, along with how far back the detection window should go. Here we are setting the minimum valid value to 200, the maximum to 2000, and the time window to the most recent 30 minutes.
+	A simple Pipe that finds threshold, or out-of-range, outliers.
+
+This Copy Pipe test for `out-of-range` anomalies across all sensors and write output to the `copy_log` Data Source. These Copy Pipes do the work of compiling their detections into a single place.
+
+These Copy Pipes do not support query parameters so some details are hardcoded in the SQL. For example, the copy_out_of_range Pipe hardcodes the minimum and maximum allowable thresholds, along with how far back the detection window should go. Here we are setting the minimum valid value to 200, the maximum to 2000, and the time window to the most recent 30 minutes.
+
 
 TOKEN "scheduled_copy_out_of_range" READ
 
 NODE select_outliers
 DESCRIPTION >
     Tests each data in the time window against a maximum and minimum value.
-    {% set _max_value=2000 %}
+
+    {% set _max_value=2000 %} 
     {% set _min_value=200 %}
     {% set _time_window_minutes=30 %}
+
     Note that Materialized views do not support parameters.
 
 SQL >
+
     %
-    SELECT id, timestamp, value, 200 AS min_value, 2000 AS max_value
+    SELECT id, timestamp, value, 
+    200 AS min_value, 
+    2000 AS max_value
     FROM incoming_data
     WHERE (value < 200 OR value > 2000) AND timestamp > NOW() - INTERVAL 30 MINUTE
 
+
+
 NODE log
-DESCRIPTION >
-    [] Revist this query and document it.
-
 SQL >
-    WITH
-        RankedData AS (
-            SELECT
-                id,
-                timestamp,
-                value,
-                ROW_NUMBER() OVER (PARTITION BY id ORDER BY timestamp DESC) AS row_num,
-                min_value,
-                max_value
-            FROM select_outliers
-        )
-    SELECT
-        id,
-        timestamp,
-        value,
-        'out-of-range' AS anomaly_type,
-        concat('min:', toString(min_value), ' max:', toString(max_value)) AS note
-    FROM RankedData
-    WHERE row_num = 1
-    ORDER BY timestamp DESC
 
-TYPE COPY
+    SELECT
+            id,
+            timestamp,
+            value,
+            'out-of-range' AS anomaly_type,
+            concat('min:', toString(min_value),' max:', toString(max_value)) AS note
+        FROM select_outliers
+        ORDER BY timestamp DESC 
+        LIMIT 1 BY id
+
+TYPE copy
 TARGET_DATASOURCE copy_log
 COPY_SCHEDULE * * * * *
-NODE copy_out_of_range_2
-SQL >
-    SELECT id, timestamp, value FROM select_outliers ORDER BY timestamp DESC LIMIT 1 BY id
+
+

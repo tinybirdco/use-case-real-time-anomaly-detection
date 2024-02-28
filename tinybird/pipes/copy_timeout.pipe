@@ -1,7 +1,10 @@
 DESCRIPTION >
-    Identify any sensors that have not reported in a specified amount of seconds
-    This Copy Pipe test for `timeout` anomalies across all sensors and write output to the `copy_log` Data Source. These Copy Pipes do the work of compiling their detections into a single place.
-    These Copy Pipes do not support query parameters so some details are hardcoded in the SQL. For example, this Pipe hardcodes the amount of time needed to quality as a timeout to `10` seconds.
+	Identify any sensors that have not reported in a specified amount of seconds
+
+This Copy Pipe test for `timeout` anomalies across all sensors and write output to the `copy_log` Data Source. These Copy Pipes do the work of compiling their detections into a single place.
+
+These Copy Pipes do not support query parameters so some details are hardcoded in the SQL. For example, this Pipe hardcodes the amount of time needed to quality as a timeout to `10` seconds.
+
 
 TOKEN "scheduled_copy_timeout" READ
 
@@ -10,29 +13,32 @@ DESCRIPTION >
     Compile the most recent reports from all sensors.
 
 SQL >
-    WITH
-        RankedData AS (
-            SELECT
-                id,
-                timestamp,
-                value,
-                ROW_NUMBER() OVER (PARTITION BY id ORDER BY timestamp DESC) AS row_num
-            FROM incoming_data
-        )
-    SELECT id, timestamp, value
-    FROM RankedData
-    WHERE row_num = 1
+
+     SELECT id, 
+          timestamp, 
+          value
+        FROM incoming_data
+        ORDER BY timestamp DESC 
+        LIMIT 1 BY id
+
+
 
 NODE log
 DESCRIPTION >
     Determine if any sensors have not reported in the specified time window.
+
     Next: add a timeout_seconds request parameter.
 
 SQL >
-    SELECT id, timestamp, value, 'timeout' AS anomaly_type, 'timestamp is time of last report' AS note
+
+    SELECT id, timestamp, value,
+    'timeout' AS anomaly_type,
+    'timestamp is time of last report' AS note
     FROM get_most_recent
     WHERE timestamp < NOW() - INTERVAL 10 SECONDS
 
-TYPE COPY
+TYPE copy
 TARGET_DATASOURCE copy_log
 COPY_SCHEDULE * * * * *
+
+

@@ -1,5 +1,6 @@
 DESCRIPTION >
-    A simple Pipe that finds threshold, or out-of-range, outliers.
+	A simple Pipe that finds threshold, or out-of-range, outliers.
+
 
 TOKEN "out_of_range_read" READ
 
@@ -8,56 +9,30 @@ DESCRIPTION >
     Tests each data in the time window against a maximum and minimum value.
 
 SQL >
+
     %
-    SELECT
-        *,
-        {{
-            Int16(
-                min_value,
-                200,
-                description="Integer. Minimum threshold, will match readings less than this number.",
-                required=False,
-            )
-        }} as min_value,
-        {{
-            Int16(
-                max_value,
-                2000,
-                description="Integer. Maximum threshold, will match readings greater than this number.",
-                required=False,
-            )
-        }} as max_value
+    SELECT *, 
+       {{Int16(min_value, 200, description="Integer. Minimum threshold, will match readings less than this number.",required=False)}} as min_value, 
+       {{Int16(max_value, 2000, description="Integer. Maximum threshold, will match readings greater than this number.",required=False)}} as max_value 
     FROM incoming_data
-    WHERE
-        value < min_value OR value > max_value
-        {% if defined(sensor_id) %} AND id = {{ Int32(sensor_id) }} {% end %}
-        AND timestamp > NOW() - INTERVAL
-        {{
-            Int16(
-                time_window_minutes,
-                10,
-                description="Search this many most recent minutes of the data history.",
-            )
-        }} MINUTE
+    WHERE value < min_value OR value > max_value
+    {% if defined(sensor_id) %}               
+      AND id = {{ Int32(sensor_id)}}
+    {% end %}    
+    AND timestamp > NOW() - INTERVAL {{Int16(time_window_minutes, 10, description="Search this many most recent minutes of the data history.")}} MINUTE
+
+
 
 NODE endpoint
 SQL >
-    WITH
-        RankedData AS (
-            SELECT
-                id,
-                timestamp,
-                value,
-                ROW_NUMBER() OVER (PARTITION BY id ORDER BY timestamp DESC) AS row_num,
-                min_value,
-                max_value
-            FROM select_outliers
-        )
-    SELECT id, timestamp, value, min_value, max_value
-    FROM RankedData
-    WHERE row_num = 1
-    ORDER BY timestamp DESC
 
-NODE test_
-SQL >
-    SELECT id, timestamp, value FROM select_outliers ORDER BY timestamp DESC LIMIT 1 BY id
+    SELECT id, 
+          timestamp, 
+          value, 
+          min_value,
+          max_value
+    FROM select_outliers
+    ORDER BY timestamp DESC 
+    LIMIT 1 BY id
+
+

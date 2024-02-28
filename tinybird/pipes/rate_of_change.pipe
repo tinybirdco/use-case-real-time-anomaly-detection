@@ -61,10 +61,3 @@ SQL >
     ORDER BY timestamp DESC
 
 
-
-NODE rate_of_change_2
-SQL >
-
-    SELECT * FROM endpoint
-
-

@@ -1,5 +1,6 @@
 DESCRIPTION >
-    Identify any sensors that have not reported in a specified amount of seconds.
+	Identify any sensors that have not reported in a specified amount of seconds.
+
 
 TOKEN "timeout_read" READ
 
@@ -8,53 +9,29 @@ DESCRIPTION >
     Compile the most recent reports from all sensors.
 
 SQL >
-    %
-    WITH
-        RankedData AS (
-            SELECT
-                id,
-                timestamp,
-                value,
-                ROW_NUMBER() OVER (PARTITION BY id ORDER BY timestamp DESC) AS row_num
-            FROM incoming_data
-            WHERE
-                timestamp > NOW() - interval
-                {{
-                    Int16(
-                        time_window_minutes,
-                        30,
-                        description="Results will be based on this number of minutes of data history. ",
-                    )
-                }} MINUTE
-        )
-    SELECT id, timestamp, value
-    FROM RankedData
-    WHERE row_num = 1
+
+     SELECT id, 
+          timestamp, 
+          value
+        FROM incoming_data
+        ORDER BY timestamp DESC 
+        LIMIT 1 BY id
+
+
 
 NODE endpoint
 DESCRIPTION >
     Determine if any sensors have not reported in the specified time window.
+
     Next: add a timeout_seconds request parameter.
 
 SQL >
+
     %
-    SELECT *
-    FROM get_most_recent
-    WHERE
-        timestamp < NOW() - INTERVAL
-        {{
-            Int16(
-                seconds,
-                30,
-                description="If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'.",
-            )
-        }} SECONDS
-        {% if defined(sensor_id) %} AND id = {{ Int32(sensor_id) }} {% end %}
+    SELECT * FROM get_most_recent
+    WHERE timestamp < NOW() - INTERVAL {{Int16(seconds,30,description="If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'.")}} SECONDS
+       {% if defined(sensor_id) %}               
+          AND id = {{ Int32(sensor_id)}}
+       {% end %}  
 
-NODE test_
-SQL >
-    SELECT id, timestamp, value FROM incoming_data ORDER BY timestamp DESC, id ASC LIMIT 1 BY id
 
-NODE timeout_3
-SQL >
-    SELECT * FROM test_ WHERE timestamp < NOW() - INTERVAL 30 SECONDS ORDER BY id ASC

@@ -1,16 +1,25 @@
 DESCRIPTION >
-    Unlike static data where you have all points at once, time-series data points arrive continuously. So, we need to define a window size for calculating the Z-score. This window represents the timeframe used to calculate the mean and standard deviation for comparison.
-    This recipe implements a simple algorith based on a time-series average and standard deviation over a minute-scale window of data. Each incoming data point, x, has a Z-Score calculated in this way:
-    `zscore = (x - avg) / stddev`
-    Currently, this Pipe is based on two time windows:
-    First, the statistics are calculated across the `_stats_time_window_minutes`.
-    Second, anomalies are scanned for using the `_anomaly_scan_time_window_seconds` window.
-    These parameters, could be promoted to API Endpoint query parameters.
-    The `zscore_multiplier` defaults to 3.
-    Named 'simple' since this does not make 10-second aggregations to avoid locality in the anomalies.
-    Cautions:
-    * Choosing an appropriate window size is crucial. A small window may be too sensitive to fluctuations, while a large window might miss recent changes.
-    * Z-scores are less effective for highly seasonal or non-stationary time series data, where the mean and standard deviation might exhibit significant trends over time.
+	Unlike static data where you have all points at once, time-series data points arrive continuously. So, we need to define a window size for calculating the Z-score. This window represents the timeframe used to calculate the mean and standard deviation for comparison.
+
+This recipe implements a simple algorith based on a time-series average and standard deviation over a minute-scale window of data. Each incoming data point, x, has a Z-Score calculated in this way:  
+
+`zscore = (x - avg) / stddev`
+
+Currently, this Pipe is based on two time windows: 
+First, the statistics are calculated across the `_stats_time_window_minutes`.
+Second, anomalies are scanned for using the `_anomaly_scan_time_window_seconds` window.
+
+These parameters, could be promoted to API Endpoint query parameters.
+
+The `zscore_multiplier` defaults to 3. 
+
+Named 'simple' since this does not make 10-second aggregations to avoid locality in the anomalies.
+
+Cautions:
+
+* Choosing an appropriate window size is crucial. A small window may be too sensitive to fluctuations, while a large window might miss recent changes.
+* Z-scores are less effective for highly seasonal or non-stationary time series data, where the mean and standard deviation might exhibit significant trends over time.
+
 
 TOKEN "simple_z_score_read" READ
 
@@ -19,56 +28,54 @@ DESCRIPTION >
     Promote these to endpoint query parameters?
 
 SQL >
+
     %
-    {% set _stats_time_window_minutes = 2 %}
-    {% set _anomaly_scan_time_window_seconds = 5 %}
-    {% set _zscore_multiplier_default = 3 %}
-    WITH
-        stats AS (
-            SELECT id, avg(value) AS average, stddevPop(value) AS stddev
-            FROM incoming_data
-            WHERE
-                timestamp BETWEEN NOW() - INTERVAL {{ Int16(_stats_time_window_minutes) }} MINUTE
-                AND NOW()
-                {% if defined(sensor_id) %} AND id = {{ Int32(sensor_id) }} {% end %}
-            GROUP BY id
-        )
-    SELECT
-        i.timestamp,
-        i.id,
-        i.value,
-        (i.value - stats.average) / stats.stddev AS zscore,
-        stats.average,
-        stats.stddev,
-        {{
-            Float32(
-                zscore_multiplier,
-                _zscore_multiplier_default,
-                description="Z-Score multipler to identify anomalies.",
-            )
-        }} AS zscore_multiplier
+    {% set _stats_time_window_minutes=2 %}
+    {% set _anomaly_scan_time_window_seconds=5 %}
+    {% set _zscore_multiplier_default=3 %}
+
+
+    WITH stats AS (
+        SELECT id,
+            avg(value) AS average,
+            stddevPop(value) AS stddev
+        FROM incoming_data
+        WHERE timestamp BETWEEN NOW() - INTERVAL {{Int16(_stats_time_window_minutes)}} MINUTE AND NOW()
+           {% if defined(sensor_id) %}               
+              AND id = {{ Int32(sensor_id)}}
+           {% end %}  
+        GROUP BY id  
+    )
+    SELECT i.timestamp, 
+         i.id, 
+         i.value, 
+         (i.value - stats.average)/stats.stddev AS zscore,
+         stats.average,
+         stats.stddev,
+         {{Float32(zscore_multiplier, _zscore_multiplier_default, description="Z-Score multipler to identify anomalies.")}} AS zscore_multiplier
     FROM incoming_data i
     JOIN stats s ON s.id = i.id
-    WHERE
-        timestamp BETWEEN now() - interval {{ Int16(_anomaly_scan_time_window_seconds) }} second
-        AND now()
+    WHERE timestamp BETWEEN now() - interval {{Int16(_anomaly_scan_time_window_seconds)}} second AND now()
     ORDER BY timestamp desc
+
+
 
 NODE endpoint
 SQL >
+
     %
-    SELECT
-        timestamp,
-        id,
-        value,
-        Round(zscore, 2) AS zscore,
-        multiIf(
-            zscore < (-1 * zscore_multiplier), 'low', zscore > zscore_multiplier, 'high', 'ok'
-        ) AS test,
-        ROUND(average, 2) AS average,
-        ROUND(stddev, 2) AS stddev,
-        zscore_multiplier
+    SELECT timestamp,
+       id,
+       value,
+       Round(zscore,2) AS zscore,
+       multiIf(zscore < (-1 * zscore_multiplier), 'low', zscore > zscore_multiplier, 'high','ok') AS test,
+       ROUND(average,2) AS average,
+       ROUND(stddev,2) AS stddev,
+       zscore_multiplier
     FROM calculate_z_score
-    WHERE
-        test = 'low' OR test = 'high' AND zscore < -1 * zscore_multiplier OR zscore > zscore_multiplier
+    WHERE test = 'low' OR test = 'high' 
+     AND zscore < -1 * zscore_multiplier OR zscore > zscore_multiplier 
     ORDER by timestamp DESC
+
+
+

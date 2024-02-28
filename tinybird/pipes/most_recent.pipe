@@ -1,24 +1,28 @@
 DESCRIPTION >
-    Returns the most recent data for each sensor.
+	Returns the most recent data for each sensor.
+
 
 TOKEN "most_recent_read" READ
 
 NODE endpoint
 SQL >
-    WITH
-        RankedData AS (
-            SELECT
-                id,
-                timestamp,
-                value,
-                ROW_NUMBER() OVER (PARTITION BY id ORDER BY timestamp DESC) AS row_num
-            FROM incoming_data
-        )
-    SELECT id, timestamp, value
-    FROM RankedData
-    WHERE row_num = 1
-    ORDER BY id ASC
+
+     SELECT id, 
+          timestamp, 
+          value
+      FROM incoming_data
+      ORDER BY id ASC, timestamp DESC 
+      LIMIT 1 BY id
+
+
+
 
 NODE test_
 SQL >
-    SELECT id, timestamp, value FROM incoming_data ORDER BY id ASC LIMIT 1 BY id
+
+    SELECT id, timestamp, value
+    FROM incoming_data
+    ORDER BY id ASC 
+    LIMIT 1 BY id
+
+
