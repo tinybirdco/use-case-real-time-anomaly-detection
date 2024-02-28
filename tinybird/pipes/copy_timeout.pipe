@@ -31,14 +31,17 @@ DESCRIPTION >
 
 SQL >
 
+    %
+    {% set _timeout_seconds = 10 %}  
+
     SELECT id, timestamp, value,
     'timeout' AS anomaly_type,
     'timestamp is time of last report' AS note
     FROM get_most_recent
-    WHERE timestamp < NOW() - INTERVAL 10 SECONDS
+    WHERE timestamp < NOW() - INTERVAL {{_timeout_seconds}} SECONDS
 
 TYPE copy
-TARGET_DATASOURCE copy_log
+TARGET_DATASOURCE copy_log_duplicates
 COPY_SCHEDULE * * * * *
 
 

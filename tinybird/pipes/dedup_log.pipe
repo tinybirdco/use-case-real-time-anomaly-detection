@@ -1,0 +1,11 @@
+NODE dedup_log_0
+SQL >
+
+    SELECT * 
+    FROM copy_log_duplicates
+    LIMIT 1 BY timestamp, id, anomaly_type
+
+TYPE materialized
+DATASOURCE copy_log
+
+

@@ -9,7 +9,7 @@ SQL >
 
     %
     SELECT * FROM copy_log
-    WHERE 1=1
+    WHERE timestamp > addHours(NOW(), -{{ Int16(hours,24,description='How many hours of detection events to return.')}})
      {% if defined(sensor_id) %}               
         AND id = {{ Int32(sensor_id, description='Single sensor of interest. ')}}
      {% end %}    
@@ -17,7 +17,7 @@ SQL >
         AND anomaly_type = {{ String(anomaly_type,description='Options: z-source, interquartile range, out-of-range, rate-of-change, timeout.') }}
      {% end %}    
     ORDER BY timestamp DESC
-    LIMIT {{ Int32(max_results, 10, description="The maximum number of most recent anomalies to return per response.") }}
+
 
 
 
@@ -25,7 +25,7 @@ NODE get_anomaly_types
 SQL >
 
     SELECT anomaly_type
-    FROM copy_log
+    FROM copy_log_duplicates
     GROUP BY anomaly_type
 
 

@@ -11,15 +11,20 @@ DESCRIPTION >
 SQL >
 
     %
+    {% set _min_value_default = 200 %}
+    {% set _max_value_default = 2000 %}
+    {% set _detect_window_seconds_default = 600 %}
+
+
     SELECT *, 
-       {{Int16(min_value, 200, description="Integer. Minimum threshold, will match readings less than this number.",required=False)}} as min_value, 
-       {{Int16(max_value, 2000, description="Integer. Maximum threshold, will match readings greater than this number.",required=False)}} as max_value 
+       {{Int16(min_value, _min_value_default, description="Integer. Minimum threshold, will match readings less than this number.",required=False)}} as min_value, 
+       {{Int16(max_value, _max_value_default, description="Integer. Maximum threshold, will match readings greater than this number.",required=False)}} as max_value 
     FROM incoming_data
     WHERE value < min_value OR value > max_value
     {% if defined(sensor_id) %}               
       AND id = {{ Int32(sensor_id)}}
     {% end %}    
-    AND timestamp > NOW() - INTERVAL {{Int16(time_window_minutes, 10, description="Search this many most recent minutes of the data history.")}} MINUTE
+    AND timestamp > NOW() - INTERVAL {{Int16(detect_window_seconds, _detect_window_seconds_default, description="Search this many most recent minutes of the data history.")}} SECONDS
 
 
 

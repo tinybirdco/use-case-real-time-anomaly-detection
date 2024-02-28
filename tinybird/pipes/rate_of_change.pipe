@@ -16,24 +16,24 @@ DESCRIPTION >
 SQL >
 
     %
-    {% set time_window_minutes=30 %}
-    {% set max_slope=3 %}
+    {% set _detect_window_seconds_default = 600 %}
+    {% set _max_slope = 3 %}
 
     SELECT id, 
-    timestamp, 
-    previous_timestamp,
-    (value - previous_value) / (timestamp - previous_timestamp) as slope,
-    value, 
-    previous_value,
-    (value - previous_value) as value_diff,
-    (timestamp - previous_timestamp) as time_diff,
-    {{Int16(max_slope, 3, description="Integer. Maximum slope, any higher than this are returned.")}} as max_slope,
-    lagInFrame(timestamp, 1) OVER 
-    (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_timestamp, 
-    lagInFrame(value, 1) 
-    OVER (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_value
+      timestamp, 
+      previous_timestamp,
+      (value - previous_value) / (timestamp - previous_timestamp) as slope,
+      value, 
+      previous_value,
+      (value - previous_value) as value_diff,
+      (timestamp - previous_timestamp) as time_diff,
+      {{Int16(max_slope, _max_slope, description="Integer. Maximum slope, any higher than this are returned.")}} as max_slope,
+      lagInFrame(timestamp, 1) OVER 
+        (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_timestamp, 
+      lagInFrame(value, 1) OVER
+        (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_value
     FROM incoming_data
-    WHERE timestamp > NOW() - INTERVAL {{Int8(time_window_minutes, 30, description="Search this many most recent minutes of the data history.")}} MINUTE
+    WHERE timestamp > NOW() - INTERVAL {{Int16(detect_window_seconds, _detect_window_seconds_default, description="Search this many most recent minutes of the data history.")}} SECOND
       {% if defined(sensor_id) %}               
         AND id = {{ Int32(sensor_id)}}
       {% end %}    

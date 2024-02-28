@@ -14,11 +14,11 @@ SQL >
     %
     SELECT DISTINCT * 
     FROM copy_log
-    WHERE 1 = 1
+    WHERE  timestamp > addHours(NOW(), -{{ Int16(hours,24,description='How many hours of detection events to return.')}})
     {% if defined(sensor_id) %}               
        AND id = {{ Int32(sensor_id)}}
     {% end %}    
     ORDER BY timestamp DESC
-    LIMIT {{ Int32(max_results, 100, description="The maximum number of most recent anomalies to return per response.") }}
+
 
 

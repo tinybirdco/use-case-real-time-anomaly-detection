@@ -13,8 +13,8 @@ SQL >
     %
     SELECT * 
     FROM incoming_data
-    WHERE toDateTime(timestamp) BETWEEN addHours(NOW(), -{{ Int16(hours,24,description='Hours.')}}) AND NOW()
-      {% if defined(sensor_id) %}
+    WHERE timestamp > addHours(NOW(), -{{ Int16(hours,24,description='How many hours of event data to return.')}})
+    {% if defined(sensor_id) %}
          AND id = {{ Int16(sensor_id,description='Sensor ID to return.')}}
       {% end %}
     ORDER BY timestamp DESC

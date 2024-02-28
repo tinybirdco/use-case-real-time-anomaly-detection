@@ -30,17 +30,16 @@ DESCRIPTION >
 SQL >
 
     %
-    {% set _stats_time_window_minutes=2 %}
-    {% set _anomaly_scan_time_window_seconds=5 %}
-    {% set _zscore_multiplier_default=3 %}
-
+    {% set _zscore_multiplier_default = 3 %}  # A multipler used to determine Z-score outliers. 
+    {% set _stats_window_minutes_default = 10 %}  # Statistical quartiles are based on this most recent window.
+    {% set _detect_window_seconds_default = 60 %} # This Pipe makes a copy every minute, so selecting events since last copy. 
 
     WITH stats AS (
         SELECT id,
             avg(value) AS average,
             stddevPop(value) AS stddev
         FROM incoming_data
-        WHERE timestamp BETWEEN NOW() - INTERVAL {{Int16(_stats_time_window_minutes)}} MINUTE AND NOW()
+        WHERE timestamp BETWEEN NOW() - INTERVAL {{Int16(stats_window_minutes, _stats_window_minutes_default)}} MINUTE AND NOW()
            {% if defined(sensor_id) %}               
               AND id = {{ Int32(sensor_id)}}
            {% end %}  
@@ -55,8 +54,8 @@ SQL >
          {{Float32(zscore_multiplier, _zscore_multiplier_default, description="Z-Score multipler to identify anomalies.")}} AS zscore_multiplier
     FROM incoming_data i
     JOIN stats s ON s.id = i.id
-    WHERE timestamp BETWEEN now() - interval {{Int16(_anomaly_scan_time_window_seconds)}} second AND now()
-    ORDER BY timestamp desc
+    WHERE timestamp BETWEEN NOW() - interval {{Int16(detect_window_seconds, _detect_window_seconds_default)}} SECOND AND NOW()
+    ORDER BY timestamp DESC
 
 
 

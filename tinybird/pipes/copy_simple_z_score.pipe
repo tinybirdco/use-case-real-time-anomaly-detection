@@ -16,12 +16,17 @@ DESCRIPTION >
 
 SQL >
 
+    %
+    {% set _zscore_multipler=2 %}  # A multipler used to determine Z-score outliers. 
+    {% set _stats_window_minutes=10 %}  # Statistical quartiles are based on this most recent window.
+    {% set _detect_window_seconds=60 %} # This Pipe makes a copy every minute, so selecting events since last copy. 
+
     WITH stats AS (
         SELECT id,
             avg(value) AS average,
             stddevPop(value) AS std_dev
         FROM incoming_data
-        WHERE timestamp BETWEEN NOW() - INTERVAL 10 minute AND NOW()
+        WHERE timestamp BETWEEN NOW() - INTERVAL {{_stats_window_minutes}} MINUTE AND NOW()
         GROUP BY id  
     )
     SELECT i.timestamp, 
@@ -30,10 +35,10 @@ SQL >
          (i.value - stats.average)/stats.std_dev AS zscore,
          ROUND(stats.average,2) AS average,
          ROUND(stats.std_dev,2) AS std_dev,
-         2 AS zscore_multiplier
+         {{_zscore_multipler}} AS zscore_multiplier
     FROM incoming_data i
     JOIN stats s ON s.id = i.id
-    WHERE timestamp BETWEEN NOW() - INTERVAL 30 SECOND AND NOW()
+    WHERE timestamp BETWEEN NOW() - INTERVAL {{_detect_window_seconds}} SECOND AND NOW()
     ORDER BY timestamp DESC
 
 
@@ -51,7 +56,7 @@ SQL >
     ORDER BY timestamp DESC
 
 TYPE copy
-TARGET_DATASOURCE copy_log
+TARGET_DATASOURCE copy_log_duplicates
 COPY_SCHEDULE * * * * *
 
 
