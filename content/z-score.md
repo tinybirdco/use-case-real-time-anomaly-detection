@@ -1,26 +1,27 @@
 # Z-Score anomalies
-## A method of generating data statistics to identify pattern changes, rather than triggering on a single, isolated data point.
+## Using averages and standard deviations to identify anomalies. 
 
-This recipe was inspired by [this previous Tinybird blog post](https://www.tinybird.co/blog-posts/anomaly-detection). 
+#### Another method of generating data statistics to identify pattern changes, rather than triggering on single or pairs of isolated data points.
 
+This recipe was inspired by [this previous Tinybird blog post about detecting anomalies with Z-scores](https://www.tinybird.co/blog-posts/anomaly-detection). 
 
-Z-scores are a valuable tool for identifying anomalies in real-time time-series data by providing a standardized way to compare individual data points to the overall trend of the data. When a sensor reading exceeds a certain Z-Score threshold, it indicates a deviation from the expected behavior. This method is effective for identifying outliers and anomalies in sensor data.
+Z-scores are a valuable tool for identifying anomalies in real-time  data by providing a standardized way to compare individual data points to the overall trend of the data. When a sensor reading exceeds a certain Z-Score threshold, it indicates a deviation from the expected behavior. This method is effective for identifying outliers and anomalies in sensor data.
 
-For each new incoming data point, the z-score is calculated using the formula:
-Z-score = (X_t - μ_t) / σ_t
+Z-scores are based on data averages and standard deviations. These statistics are based on a moving time window of the recent data. 
+
+For each new incoming data point, the Z-score is calculated using the formula:
+Z-score = (value - average) / stddev
 where:
 
-* X_t is the value of the data point at time t.
-* μ_t is the rolling average of the data within a chosen window around time t.
-* σ_t is the rolling standard deviation of the data within the same window.
-
-Unlike static data where you have all points at once, time-series data points arrive continuously. So, we need to define a window size for calculating the Z-score. This window represents the timeframe used to calculate the mean and standard deviation for comparison.
+* `value` is the data point being evaluated. 
+* `average` is the average of the data within the chosen time window.
+* `stddev` is the standard deviation of the data within the same window.
 
 Currently, this Pipe is based on two time windows:
 1) First, the statistics are calculated across the `_stats_time_window_minutes` interval.
 2) Second, anomalies are scanned for using the `_detect_window_seconds` interval.
 
-The zscore_multiplier defaults to 3.
+Below the `zscore_multiplier defaults to 3, and this parameter is one to experiment with. 
 
 Note:
 
@@ -28,10 +29,13 @@ Note:
 * Z-scores are less effective for highly seasonal or non-stationary time series data, where the mean and standard deviation might exhibit significant trends over time.
 
 
-
-
 ## `z_score` Pipe and Endpoint
 
+The `z_score` Pipe is designed to be flexible by supporting the following API Endpoint query parameters:
+* **sensor_id** - Used to select a single sensor of interest.
+* **zscore_threshold** - The threshold for determining Z-score outliers. Compared with absolute value of Z-score.
+* **stats_window_minutes** - Defines the time window (in minutes) for calculating data averages and standard deviations used to calculate Z-score.
+* **detect_window_seconds** - Defines the time window (in seconds) for selecting data points to examine for anomalies. If polling on an interval, this can be set to match that interval to minimize duplicate detections.
 
 ### `calculate_z_score` Node
 

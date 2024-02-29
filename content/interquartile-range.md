@@ -1,9 +1,13 @@
 # Interquartile Range (IQR) anomalies
 ## Using quartiles to identify anomalies. 
 
-### Another method of generating data statistics to identify pattern changes, rather than triggering on single or pairs of isolated data points.
+#### Another method of generating data statistics to identify pattern changes, rather than triggering on single or pairs of isolated data points.
 
-The first step of the Interquartile Range (IQR) method is calculating the first and third quartiles (Q1 and Q3). The difference between these two quartiles is referred to as the IQR, as in:
+The Interquartile Range (IQR) method is a valuable tool for identifying anomalies in real-time data by providing a standardized way to compare individual data points to the overall trend of the data. This method is effective for identifying outliers and anomalies in sensor data. When a sensor reading is outside of an IQR-based range, it indicates a deviation from the expected behavior. 
+
+The first step of the Interquartile Range (IQR) method is calculating the first and third quartiles (Q1 and Q3). These quartiles are based on a moving time window of the recent data. 
+
+The difference between these two quartiles is referred to as the IQR, as in:
 
 IQR = Q3 - Q1
 
