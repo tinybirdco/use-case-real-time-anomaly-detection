@@ -31,6 +31,8 @@ Note:
 
 ## `z_score` Pipe and Endpoint
 
+The `z_score` Pipe consiste of two Nodes: `calculate_z_score` and `endpoint`.
+
 The `z_score` Pipe is designed to be flexible by supporting the following API Endpoint query parameters:
 * **sensor_id** - Used to select a single sensor of interest.
 * **zscore_threshold** - The threshold for determining Z-score outliers. Compared with absolute value of Z-score.
