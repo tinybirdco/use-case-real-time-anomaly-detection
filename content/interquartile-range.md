@@ -16,10 +16,14 @@ Data points that are below or above some level based on a multiplier of this IQR
 * values < Q1 - (IQR * 1.5) 
 * values > Q3 + (IQR * 1.5) 
 
-
 ## `iqr` Pipe and Endpoint
 
-This Pipe is based on a single Node, named `endpoint`.
+The `iqr` Pipe is designed to be flexible by supporting the following API Endpoint query parameters:
+* **sensor_id** - Used to select a single sensor of interest.
+* **iqr_multiplier** - The threshold for determining Z-score outliers. Compared with absolute value of Z-score.
+* **stats_window_minutes** - Defines the time window (in minutes) for calculating data averages and standard deviations used to calculate Z-score.
+* **detect_window_seconds** - Defines the time window (in seconds) for selecting data points to examine for anomalies. If polling on an interval, this can be set to match that interval to minimize duplicate detections.
+* **max_per_sensor** - Used to limit the number of IQR anomalies to return by sensor.
 
 ### `endpoint` Node
 

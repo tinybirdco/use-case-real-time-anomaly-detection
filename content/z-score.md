@@ -5,7 +5,7 @@
 
 This recipe was inspired by [this previous Tinybird blog post about detecting anomalies with Z-scores](https://www.tinybird.co/blog-posts/anomaly-detection). 
 
-Z-scores are a valuable tool for identifying anomalies in real-time  data by providing a standardized way to compare individual data points to the overall trend of the data. When a sensor reading exceeds a certain Z-Score threshold, it indicates a deviation from the expected behavior. This method is effective for identifying outliers and anomalies in sensor data.
+Z-scores are a valuable tool for identifying anomalies in real-time data by providing a standardized way to compare individual data points to the overall trend of the data. When a sensor reading exceeds a certain Z-Score threshold, it indicates a deviation from the expected behavior. This method is effective for identifying outliers and anomalies in sensor data.
 
 Z-scores are based on data averages and standard deviations. These statistics are based on a moving time window of the recent data. 
 
