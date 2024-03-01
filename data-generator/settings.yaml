@@ -6,7 +6,7 @@ num_iterations: 1000000
 id_init_min: 1400
 id_init_max: 1600
 
-valid_min: 400
+valid_min: 200
 valid_max: 2000
 percent_out_of_bounds: 0.03
 percent_out_of_bounds_high: 100
