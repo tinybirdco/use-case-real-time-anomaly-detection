@@ -1,5 +1,8 @@
 DESCRIPTION >
 	Identify any sensors that have not reported in a specified amount of seconds.
+See [HERE](https://github.com/tinybirdco/anomaly-detection/blob/main/content/timeout.md) for more background on this recipe.
+
+This Pipe select each sensor's most recent data report, and determines if it has reported within the number of specified seconds.
 
 
 TOKEN "timeout_read" READ
@@ -23,8 +26,6 @@ NODE endpoint
 DESCRIPTION >
     Determine if any sensors have not reported in the specified time window.
 
-    Next: add a timeout_seconds request parameter.
-
 SQL >
 
     %
@@ -33,7 +34,7 @@ SQL >
     SELECT * FROM get_most_recent
     WHERE timestamp < NOW() - INTERVAL {{Int16(seconds,_timeout_seconds,description="If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'.")}} SECONDS
        {% if defined(sensor_id) %}               
-          AND id = {{ Int32(sensor_id)}}
+          AND id = {{ Int32(sensor_id, description="Used to select a single sensor of interest. Optional.")}} 
        {% end %}  
 
 

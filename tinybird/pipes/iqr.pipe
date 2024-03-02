@@ -1,74 +1,58 @@
 DESCRIPTION >
 	This Pipe uses the [Interquartile Range (IQR)](https://en.wikipedia.org/wiki/Interquartile_range) to identify anomalies.
 
-IQR is based on calculating the lower (first) and upper (fourth) quartiles, and then matching on data outside of that range.
+See [HERE](https://github.com/tinybirdco/anomaly-detection/blob/main/content/interquartile-range.md) for more background on this recipe.
 
-The IQR = (upper quartile - lower quartile) * 1.5
+Note: the `max_per_sensor` LIMIT was added because with high velocity data streams (many reports per second), many, many detections can occur around step function. When these occur, a stream of these anomalies are detected until the new post-step data range become the new normal. So, this parameter was added to provide some throttling of these detection events. 
 
-Data are identified as outliers if they are less than [lower quartile - IQR] or greater than [upper quartile + IQR].
+If you want to receive all detection events, you can set that parameter to a high number as to not limit at all. 
 
-Calculation of the IQR is based on a time window of data (here we are hardcoding to a 10-minute window).
+[] TODO: When limiting a set of consectutive IQR anomaly events, the most recent events are selected. It seems we should be selecting the leading instances of this anomaly, instead of the trailing edge,  
+
+Also note that the Copy Pipe version of this Pipe does not use this LIMIT. All detection events are written to the destination Data Source.
 
 
 TOKEN "iqr_read" READ
 
-NODE get_stats
+NODE endpoint
 DESCRIPTION >
-    Based on a time window (hardcoded here to a 10-minute window), calculate the lower quartile, the medium, and the upper quartile. The IQR is then set to (upper quartile - lower quartile) * 1.5.
+    The `endpoint` Node uses a Common Table Expression (CTE) to determine Q1 and Q3 for a time window of recent data based on the `stats_window_minutes` parameter. This Node also implements the query parameter for selecting a sensor id of interest. 
 
-    Based on the IQR, lower and upper bounds are set for determining data outliers:
-    * lower bound = lower quartile - IQR
-    * upper bound = upper quartile + IQR
+    The main query JOINs with the `stats` CTE and tests each event within the `detect_window_seconds` against the lower and upper bounds based on the IQR and the multiplier. This query also supports a `max_per_sensor` parameter for limiting the number of anomaly events to return per sensor.
 
 SQL >
 
     %
-    {% set _iqr_multipler=1.5 %}  # A multipler used to determine the IQR value. 
-    {% set _stats_window_minutes=10 %}  # Statistical quartiles are based on this most recent window.
-    {% set _detect_window_seconds=600 %} # For each request, we look back 10 minutes. 
+    {% set _iqr_multiplier=1.5 %}  # A multipler used to determine the IQR value. 
+    {% set _stats_window_minutes_default=10 %}  # Statistical quartiles are based on this most recent window.
+    {% set _detect_window_seconds_default=600 %} # For each request, we look back 10 minutes. 
+    {% set _max_per_sensor = 10 %}  # A maximum number of IQR anomaly events to report per sensor. 
 
     WITH stats AS (SELECT id,
        quantileExact(0.25) (value) AS lower_quartile,
-       quantileExact(0.5) (value) AS mid_quartile,
+       # quantileExact(0.5) (value) AS mid_quartile,  # Not needed.
        quantileExact(0.75) (value) AS upper_quartile,
-       (upper_quartile - lower_quartile) * {{_iqr_multipler}} AS IQR
+       (upper_quartile - lower_quartile) * {{Float32(iqr_multiplier, _iqr_multiplier, description = "The multiplier of the IQR to set the range for testing for IQR anomalies.")}} AS IQR
     FROM incoming_data
-    WHERE timestamp >= toDate(NOW()) - INTERVAL {{Int16(_stats_window_minutes)}} MINUTES
+    WHERE timestamp BETWEEN (NOW() - INTERVAL {{Int16(stats_window_minutes, _stats_window_minutes_default ,description="Defines the time window (in MINUTES) for calculating data averages and standard deviations used to calculate Z-score")}} MINUTE) AND NOW()
       {% if defined(sensor_id) %}               
-        AND id = {{ Int32(sensor_id)}}
+        AND id = {{ Int32(sensor_id, description="Used to select a single sensor of interest. ")}}
       {% end %}    
     GROUP BY id
     )
      SELECT DISTINCT timestamp, 
         id, 
         value, 
+        ROUND(stats.IQR,2) AS IQR,       
         ROUND((stats.lower_quartile - stats.IQR),2) AS lower_bound, 
         ROUND((stats.upper_quartile + stats.IQR),2) AS upper_bound 
      FROM incoming_data
      JOIN stats ON incoming_data.id = stats.id
-     WHERE timestamp >= toDate(NOW()) - INTERVAL {{Int16(_detect_window_seconds)}} SECONDS
+     WHERE timestamp BETWEEN NOW() - interval {{Int32(detect_window_seconds, _detect_window_seconds_default, description="Defines the time window (in SECONDS) for selecting data points to examine for anomalies. If polling on an interval, this can be set to match that interval to minimize duplicate detections.")}} SECOND AND NOW()
      AND (value > (stats.upper_quartile + stats.IQR)
      OR value < (stats.lower_quartile - stats.IQR))
      ORDER BY timestamp DESC
-
-
-
-
-NODE endpoint
-DESCRIPTION >
-    Selects the most recent IQR-based outlier for each sensor.
-
-SQL >
-
-    SELECT id, 
-          timestamp, 
-          value,
-          lower_bound,
-          upper_bound
-        FROM get_stats
-        ORDER BY timestamp DESC 
-        LIMIT 1 BY id
-
+     LIMIT {{Int16(max_per_sensor,_max_per_sensor, description="Used to limit the number of IQR anomalies to return by sensor.")}} BY id
 
 
 

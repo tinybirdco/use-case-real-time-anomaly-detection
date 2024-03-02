@@ -20,8 +20,7 @@ DESCRIPTION >
 SQL >
 
     %
-
-    {% set _detect_window_seconds=60 %}  # This Pipe makes a copy every minute, so selecting events since last copy. 
+    {% set _detect_window_seconds=61 %} # This Pipe makes a copy every minute, so selecting events since last copy plus one minute. 
     {% set _max_slope = 3 %}
 
     SELECT id, 

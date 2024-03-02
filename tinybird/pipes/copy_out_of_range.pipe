@@ -21,10 +21,9 @@ DESCRIPTION >
 SQL >
 
     %
-
     {% set _min_value=200 %}
     {% set _max_value=2000 %}
-    {% set _detect_window_seconds=60 %}  # This Pipe makes a copy every minute, so selecting events since last copy. 
+    {% set _detect_window_seconds=61 %} # This Pipe makes a copy every minute, so selecting events since last copy plus one minute. 
 
     SELECT id, timestamp, value, 
     {{_min_value}} AS min_value, 

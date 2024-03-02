@@ -1,5 +1,7 @@
 DESCRIPTION >
 	Calculates the rate-of-change, or slope, between the most recent data point and the previous points.
+See [HERE](https://github.com/tinybirdco/anomaly-detection/blob/main/content/rate-of-change.md) for more background on this recipe.
+
 
 This relies on the ClickHouse `lagInFrame` function.
 
