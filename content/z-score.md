@@ -1,5 +1,5 @@
 # Z-Score anomalies
-## Using averages and standard deviations to identify anomalies. 
+### Using averages and standard deviations to identify anomalies. 
 
 #### Another method of generating data statistics to identify pattern changes, rather than triggering on single or pairs of isolated data points.
 

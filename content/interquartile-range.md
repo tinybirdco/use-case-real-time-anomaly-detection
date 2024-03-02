@@ -1,5 +1,5 @@
 # Interquartile Range (IQR) anomalies
-## Using quartiles to identify anomalies. 
+### Using quartiles to identify anomalies. 
 
 #### Another method of generating data statistics to identify pattern changes, rather than triggering on single or pairs of isolated data points.
 

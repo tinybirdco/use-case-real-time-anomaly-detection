@@ -1,5 +1,5 @@
 # Out-of-range anomalies
-## Checks the incoming data and tests to see if the values are within a 'valid' range. 
+### Checks the incoming data and tests to see if the values are within a 'valid' range. 
 
 Establishing threshold limits helps identify abnormal sensor readings. If a sensor reports a value outside of a valid range defined by minimum and maximum values. This method is effective for detecting sudden spikes or drops in data that may indicate a malfunction or abnormal conditions.
 

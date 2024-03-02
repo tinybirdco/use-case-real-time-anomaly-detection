@@ -6,6 +6,7 @@ Monitoring the rate of change in sensor readings is crucial for identifying abru
 To determine the slope, the previous report is retrieved and compared with the current report. The rate-of-change, or slope, is equal to the change in the y-values over the change in x-values.   
 
 Knowing the current and previous values, slope is calculated as:
+
  `(value - previous_value) / (timestamp - previous_timestamp) AS slope`
 
 
@@ -25,7 +26,7 @@ OVER (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PREC
 
 ```
 
-These query statements calculates the lag of the `timestamp` and `value` attributes within each partition defined by the id. Specifically, it retrieves the `timestamp` and `value` values from the row that precedes the current row by 1 position within each partition. The `ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING` clause specifies the window frame over which the lag function operates. In this case, it is looking at the immediately preceding row. 
+These query statements surface the previous `timestamp` and `value` attributes within each partition defined by the `id`. Specifically, it retrieves the `timestamp` and `value` values from the row that precedes the current row by 1 position within each partition. The `ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING` clause specifies the window frame over which the lag function operates. In this case, it is looking at the immediately preceding row. 
 
 ## `rate_of_change` Pipe and Endpoint
 
