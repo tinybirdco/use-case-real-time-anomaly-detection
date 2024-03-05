@@ -1,0 +1,24 @@
+DESCRIPTION >
+	This endpoint responds with sensor data created with this [data generator](https://github.com/tinybirdco/anomaly-detection/blob/main/data-generator/anomaly-dataset-live.py).
+
+
+TOKEN "get_data_read" READ
+
+NODE endpoint
+DESCRIPTION >
+    {% set id = 1 %}
+
+SQL >
+
+    %
+    SELECT * 
+    FROM incoming_data
+    WHERE timestamp > addHours(NOW(), -{{ Int16(hours,24,description='How many hours of event data to return.')}})
+    {% if defined(sensor_id) %}
+         AND id = {{ Int16(sensor_id,description='Sensor ID to return.')}}
+      {% end %}
+    ORDER BY timestamp DESC
+
+
+
+
