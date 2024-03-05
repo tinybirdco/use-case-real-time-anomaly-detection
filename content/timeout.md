@@ -1,5 +1,5 @@
 # Timeout anomalies
-### Checks the most recent report from each sensor and tests to see if it is reporting on its expected interval.
+#### Checks the most recent report from each sensor and tests to see if it is reporting on its expected interval.
 
 Knowing when a sensor has last reported is a fundamental detail of interest across most use cases. Having these data makes it possible to fine-tune the detection of when a sensor has stopped reporting. Sensors typically have some frequency they are expected to report on. Many sensor networks, such as ones that support manufacturing and vehicle monitoring, emit events many times a second. When a sensor has not reported in a few seconds, it is an anomaly of interest. Weather networks typically report in on some 'heartbeat' interval to confirm their connectivity when what it measures is absent, as with rain gauges. As with other IoT networks, the expected report frequency is commonly on the order of minutes and hours. 
 

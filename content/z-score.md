@@ -1,7 +1,7 @@
 # Z-Score anomalies
-### Using averages and standard deviations to identify anomalies. 
+#### Using averages and standard deviations to identify anomalies. 
 
-#### Another method of generating data statistics to identify pattern changes, rather than triggering on single or pairs of isolated data points.
+##### Another method of generating data statistics to identify pattern changes, rather than triggering on single or pairs of isolated data points.
 
 This recipe was inspired by [this previous Tinybird blog post about detecting anomalies with Z-scores](https://www.tinybird.co/blog-posts/anomaly-detection). 
 

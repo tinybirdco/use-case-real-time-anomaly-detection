@@ -1,5 +1,5 @@
 # Rate-of-change anomalies
-### Checks incoming data and calculates the rate of change, or slope, based on the previous data point. A simple concept with a more-complicated-than-expected implementation. 
+#### Checks incoming data and calculates the rate of change, or slope, based on the previous data point. A simple concept with a more-complicated-than-expected implementation. 
 
 Monitoring the rate of change in sensor readings is crucial for identifying abrupt changes in the system. By setting thresholds on the slope of the data, you can detect instances where the rate of change exceeds an acceptable limit. This is particularly useful for identifying gradual deteriorations or sudden disruptions.
 
