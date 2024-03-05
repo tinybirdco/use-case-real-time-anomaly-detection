@@ -26,6 +26,16 @@ Through this project, we aim to provide a practical guide for data engineers, an
 
 ## Project resources
 
+The main components of this project are:
+
+* A **Tinybird Data Project** in the `tinybird` folder with Pipes that implement different recipes to detect outliers and anomalies. It also provides Data Source definitions, including their data schema and database details. 
+
+* A **data generator** that emits time-series data with outliers and anomalies. With this script you can curate data with prescibed outliers and trends.  See [HERE](./data-generator/readme.md) for more details. 
+
+* A **Grafana dashboard** that displays the time-series data along with anomaly detection summaries. 
+
+![Anomaly detection dashboard](./charts/dashboard-poc.png)
+
 This project includes Tinybird Pipe 'recipes' that implement the following methods for detecting anomalies: 
 
 * **[Out-of-range](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/out-of-range.md)** - Compares data with a set maximum and minimum values. This recipe works with individual data points, and uses the most simple queries.  
@@ -36,15 +46,6 @@ This project includes Tinybird Pipe 'recipes' that implement the following metho
 
 The Interquartile-range and Z-score methods generate time-series statistics to identify *pattern* changes, rather than triggering on a single, isolated data point.
 
-The main components of this project are:
-
-* A **Tinybird Data Project** in the `tinybird` folder with Pipes that implement different recipes to detect outliers and anomalies. It also provides Data Source definitions, including their data schema and database details. 
-
-* A **data generator** that emits time-series data with outliers and anomalies. With this script you can curate data with prescibed outliers and trends.  See [HERE](./data-generator/readme.md) for more details. 
-
-* A **Grafana dashboard** that displays the time-series data along with anomaly detection summaries. 
-
-![Anomaly detection dashboard](./charts/dashboard-poc.png)
 
 ## Getting started
 
@@ -93,43 +94,4 @@ For this project, a first step was building tools for generating time-series dat
 * Sensors that *stop reporting*.
 
 Kicking off the project with a set of data generator tools. These tools generate single-value time-series data for a set of sensors. See the [the data-generator readme](./data-generator/readme.md) for more details.
-
-## Data Project
-
-The `anomaly-detection` data project includes two Data Sources and over a dozen Pipes. 
-
-### /datasources
-* incoming_data - where the ingested data is written to. 
-* copy_log - stores a compilation of anomaly detections. 
-
-### /pipes 
-
-There are two Pipes for each of the five anomaly types. One set provides 'recipes' for creating API Endpoints for each detection technique. The other set are `Copy Pipes` that apply the same queries and write output to a shared `copy_log`. 
-
-The `get_anomalies` Pipe provides an API Endpoint for querying the triggered anomalies log. This makes it possible to query a single endpoint and receive results from all five detection methods.  
-
-
-### Copy Pipes
-
-These Copy Pipes are based on the anomaly detection Pipes. Their Job is to test for anomalies across all sensors and write output to the `copy_log` Data Source. These Copy Pipes do the work of compiling their detections into a single place. 
-
-These Copy Pipes are configured to run every few minutes. In that sense, the compiled log is not up-to-the-second fresh, but does provide a single Endpoint to monitor five types of anomalies across an entire set of sensors. 
-
-These Copy Pipes do not support query parameters so some details are hardcoded in the SQL. For example, the `copy_out_of_range` Pipe hardcodes the minimum and maximum allowable thresholds, along with how far back the detection window should go. Here we are setting the minimum valid value to 200, the maximum to 2000, and the time window to the most recent 30 minutes. 
-
-```sql
-SELECT *, 200 AS min_value, 2000 AS max_value 
-FROM incoming_data
-WHERE (value < 200 OR value > 2000)
-AND timestamp > NOW() - INTERVAL 30 MINUTE
-```
-Here we are adding `min_value` and `max_value` to the SELECT statement to pass them to a subsequent Node that records these values in a `note` column. 
-
-### Compiling detections into a single source  
-
-The `monitor_logs` API Endpoint pulls from the `copy_log` Data Source that is fed by the Copy Pipes, which get triggered every few minutes. The endpoint returns a list of anomaly detections across the set of sensors for all the anomaly types.  
-
-While this compilation is not based on up-to-the-second fresh data, this endpoint provides a single endpoint that covers the five different anomaly types with a up-to-the-minute results.  
-
-`https://api.tinybird.co/v0/pipes/monitor_logs.json`
 
