@@ -6,11 +6,9 @@ This project is a collection of content in support of demonstrating how Tinybird
 
 ## Introduction
 
-Anomalies, or outliers, in data can often signify critical events, deviations from expected behavior, or potential issues that require immediate attention. Detecting these anomalies in real-time enables you to take proactive measures, mitigate risks, and optimize operations. 
+Anomalies, or outliers, in data can often signify critical events, deviations from expected behavior, or potential issues that require immediate attention. Detecting these anomalies in real-time enables you to take proactive measures, mitigate risks, and optimize operations. In this project we demonstrate how various types of anomalies can be detected and flagged in streaming data.
 
-In this project, we present a set of 'recipes' for detecting anomalies in real-time streaming data using SQL-based queries implemented in Tinybird Pipes. By leveraging Tinybird Pipes, we showcase how various types of anomalies can be detected and flagged in streaming data in support of timely decision-making.
-
-The project focuses on five main types of anomalies:
+The project focuses on five types of anomalies:
 
 * **Out-of-range**: Identifying data points that fall outside a specified valid range.
 * **Rate-of-change**: Detecting abrupt changes or spikes in the rate of change of data.
@@ -18,7 +16,7 @@ The project focuses on five main types of anomalies:
 * **Interquartile Range (IQR)**: Using statistical methods to identify outliers based on the interquartile range.
 * **Z-score**: Applying standard deviation-based analysis to identify anomalies in the data distribution.
 
-Each anomaly detection method is implemented as SQL queries within separate Pipes. The project demonstrates how these SQL-based anomaly detection recipes can be integrated into real-world data pipelines to monitor and analyze streaming data streams continuously.
+Each anomaly detection method is implemented as SQL queries within separate Tinybird Pipes and published as an API Endpoint. 
 
 
 ## Project resources
@@ -33,7 +31,9 @@ The main components of this project are:
 
 ![Anomaly detection dashboard](./charts/dashboard-poc.png)
 
-This project includes Tinybird Pipe 'recipes' that implement the following methods for detecting anomalies: 
+## Anomaly detection methods
+
+This repository includes a `/content` folder with descriptions of each anomaly detection method (see links below to learn more): 
 
 * **[Out-of-range](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/out-of-range.md)** - Compares data with a set maximum and minimum values. This recipe works with individual data points, and uses the most simple queries.  
 * **[Timeout](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/timeout.md)** - Finds the most recent report for each sensor and checks if it is within the 'timeout' window.  
