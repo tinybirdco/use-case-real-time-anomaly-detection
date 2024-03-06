@@ -39,3 +39,10 @@ WHERE value < min_value OR value > max_value
 AND timestamp > NOW() - INTERVAL {{Int16(detect_window_seconds, _detect_window_seconds_default, description="Search this many most recent minutes of the data history.")}} SECONDS
 ORDER BY timestamp DESC
 ```
+
+## Example
+
+Here is an example of detecting this type of anomaly:
+
+![Out-of-range anomaly detected](../charts/sensor_10_anomaly_out-of-range.png)
+

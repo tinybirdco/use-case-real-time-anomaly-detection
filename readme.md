@@ -38,15 +38,18 @@ This repository includes a `/content` folder with descriptions of each anomaly d
 * **[Out-of-range](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/out-of-range.md)** - Compares data with a set maximum and minimum values. This recipe works with individual data points, and uses the most simple queries.  
 * **[Timeout](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/timeout.md)** - Finds the most recent report for each sensor and checks if it is within the 'timeout' window.  
 * **[Rate-of-change](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/rate-of-change.md)** - Looks up the two most recent data points and determines the rate of change, or slope, and compares that to a maximax allowable slope.  
+
+The Interquartile-range and Z-score methods generate time-series statistics to identify *pattern* changes, rather than triggering on a single or pair of isolated data points.
+
 * **[Interquartile-range](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/interquartile-range.md)** - Generates a `IQR` range based on first and fourth quartiles and a multipler and used to define an 'acceptable' range. 
 * **[Z-score](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/z-score.md)** - Generates a `Z score` based on data averages and standard deviations, with all scores above a threshold identified as anomalies.  
-
-The Interquartile-range and Z-score methods generate time-series statistics to identify *pattern* changes, rather than triggering on a single, isolated data point.
 
 
 ## Getting started
 
-This Tinybird project offers two distinct sets of Pipes for implementing anomaly detection: 
+This Tinybird project offers two designs with distinct sets of Pipes for implementing anomaly detection. 
+
+### Individual endpoints or a common log
 
 * **Individual endpoints** where checks for individual anomaly types are made separately with API requests. So, each anomaly type has its own API Endpoint. With these endpoints you can pick and choose the anomaly types you want to detect, and make requests as needed. Every endpoint, except for the `timeout` type, has a `detect_window_seconds` query parameter that enables you to adjust what data interval to check based on when you last made a request. With the `timeout` API Endpoint, you can specify a `seconds` query parameter and it returns any sensor that has not reported within that amount of time.
 
