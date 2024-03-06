@@ -1,16 +1,14 @@
 
 # Anomaly detection 
 
-This project is a collection of content in support of demonstrating how Tinybird can be used to detect anomalies and support anomaly-detection systems. 
+This project is a collection of content in support of demonstrating how Tinybird can be used to detect anomalies and support anomaly-detection systems. With this project, we aim to provide a practical guide for data engineers, analysts, and decision-makers interested in detecting anomalies in data ingested into Tinybird. 
+
 
 ## Introduction
 
-Anomalies, or outliers, in data can often signify critical events, deviations from expected behavior, or potential issues that require immediate attention. Detecting these anomalies in real-time enables you to take proactive measures, mitigate risks, and optimize operations.
+Anomalies, or outliers, in data can often signify critical events, deviations from expected behavior, or potential issues that require immediate attention. Detecting these anomalies in real-time enables you to take proactive measures, mitigate risks, and optimize operations. 
 
-{context about developing recipes using SQL}
-
-
-In this project, we present a set of 'recipes' for detecting anomalies in real-time streaming data using SQL-based queries implemented within Tinybird Pipes. By leveraging Tinybird Pipes, we showcase how various types of anomalies can be detected and flagged in streaming data, facilitating timely decision-making and proactive intervention.
+In this project, we present a set of 'recipes' for detecting anomalies in real-time streaming data using SQL-based queries implemented in Tinybird Pipes. By leveraging Tinybird Pipes, we showcase how various types of anomalies can be detected and flagged in streaming data in support of timely decision-making.
 
 The project focuses on five main types of anomalies:
 
@@ -20,9 +18,8 @@ The project focuses on five main types of anomalies:
 * **Interquartile Range (IQR)**: Using statistical methods to identify outliers based on the interquartile range.
 * **Z-score**: Applying standard deviation-based analysis to identify anomalies in the data distribution.
 
-Each anomaly detection method is implemented as SQL queries within anomaly type-specific Tinybird Pipes, allowing for efficient and scalable processing of streaming data. The project demonstrates how these SQL-based anomaly detection recipes can be seamlessly integrated into real-world data pipelines to monitor and analyze streaming data streams continuously.
+Each anomaly detection method is implemented as SQL queries within separate Pipes. The project demonstrates how these SQL-based anomaly detection recipes can be integrated into real-world data pipelines to monitor and analyze streaming data streams continuously.
 
-Through this project, we aim to provide a practical guide for data engineers, analysts, and decision-makers interested in leveraging SQL and streaming data technologies to detect anomalies in real-time data streams effectively. By following the examples and best practices outlined in this project, organizations can enhance their ability to detect, respond to, and mitigate anomalies in their streaming data environments, ultimately improving operational efficiency and business resilience.
 
 ## Project resources
 
