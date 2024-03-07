@@ -1,11 +1,23 @@
 # Timeout anomalies
+
 #### Checks the most recent report from each sensor and tests to see if it is reporting on its expected interval.
 
-Knowing when a sensor has last reported is a fundamental detail of interest across most use cases. Having these data makes it possible to fine-tune the detection of when a sensor has stopped reporting. Sensors typically have some frequency they are expected to report on. Many sensor networks, such as ones that support manufacturing and vehicle monitoring, emit events many times a second. When a sensor has not reported in a few seconds, it is an anomaly of interest. Weather networks typically report in on some 'heartbeat' interval to confirm their connectivity when what it measures is absent, as with rain gauges. As with other IoT networks, the expected report frequency is commonly on the order of minutes and hours. 
+[Endpoint documentation](https://api.tinybird.co/endpoint/t_f803a2aa360f486cb885333eaf93b016?token=p.eyJ1IjogIjJjOGIyYzQ2LTU4NzYtNGU5Mi1iNGJkLWMwNTliZDFhNzUwZSIsICJpZCI6ICJiZjYwZTgyZi1iNWFjLTRjMzgtODJkZS1iYzhjMmNiNTY4YWUiLCAiaG9zdCI6ICJldV9zaGFyZWQifQ.rXUC9lNg6Q4QKcbHL_OS73scKSuGzG6uCXG9qwBq8_s)
+
+Supported query parameters:
+
+* sensor_id - Used to select a single sensor of interest. Otherwise, returns results for all sensors.. 
+* seconds - If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'. Defaults to 30.
+
+## Introduction
+
+Knowing when a sensor has last reported is a fundamental detail of interest across most use cases. Having these data makes it possible to develop detections of when a sensor has stopped reporting. Sensors typically have some frequency they are expected to report on. Many sensor networks, such as ones that support manufacturing and vehicle monitoring, emit events many times a second. When a sensor has not reported in a few seconds, it is an anomaly of interest. Weather networks typically report in on some 'heartbeat' interval to confirm their connectivity when what it measures is absent, as with rain gauges. As with other IoT networks, the expected report frequency is commonly on the order of minutes and hours. 
 
 The 'recipe' for detecting timeouts starts with looking up the **most recent** reports for each sensor of interest. 
 
-The following query relies on the ClickHouse-provided `LIMIT # BY field` statement. 
+## Selecting more recent reports
+
+The following query selects for the most recent report from every sensor. It relies on the ClickHouse-provided `LIMIT # BY field` statement. 
 
 ```sql
 
@@ -26,13 +38,13 @@ FROM get_most_recent
 WHERE timestamp < NOW() - INTERVAL 30 SECONDS
 ```
 
+This query returns any sensors that have 'timedout.' 
+
 ## `timeout` Pipe and Endpoint
 
-The `timeout` Pipe consists two Nodes, `get_most_recent` and `endpoint`. 
-
-The `endpoint` Node adds support for these two query parameters:
-* **seconds** - The number of seconds that defines the interval a sensor is expected to report on. 
-* **sensor_id** - Used to select a single sensor of interest.
+The `timeout` Pipe consists two Nodes:
+  * `get_most_recent` 
+  * `endpoint` 
 
 ### `get_most_recent` Node
 
@@ -49,19 +61,21 @@ As the name indicates, this Node select the *most recent* report from every sens
 
 ### `endpoint` Node
 
+This Node introduces query parameters for requesting data for a specific sensor and setting the timeout interval in seconds. 
 
 ```sql
 %
 
-{% set _timeout_seconds = 30 %}  
-
+%
 SELECT * FROM get_most_recent
-WHERE timestamp < NOW() - INTERVAL {{Int16(seconds,_timeout_seconds,description="If a sensor has not reported in the specified number of seconds, it is considered 'timedout'.")}} SECONDS
+WHERE timestamp < NOW() - INTERVAL {{Int16(seconds,30,description="If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'.")}} SECONDS
    {% if defined(sensor_id) %}               
       AND id = {{ Int32(sensor_id, description="Used to select a single sensor of interest. Optional.")}} 
    {% end %}  
-
 ```
+
+
+
 
 
 ## Introduction to ClickHouse time windows 
@@ -96,3 +110,16 @@ WHERE
 ```
 
 We will revisit ClickHouse window functions when we discuss  [**rate-of-change** anomaly detection](rate-of-change.md). 
+
+
+sensor_5_anomaly_timeout
+
+## Example
+
+Below is an example of detecting this type of anomaly. Here the 'timeout' is set to thirty seconds. When called, this endpoint confirms sensors have reported with this many seconds. 
+
+`https://api.tinybird.co/v0/pipes/timeout.json?sensor_id=1&seconds=30`
+
+![Timeout anomaly detected](../charts/sensor_5_anomaly_timeout.png)
+
+
