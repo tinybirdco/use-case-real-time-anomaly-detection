@@ -42,7 +42,7 @@ This query returns any sensors that have 'timedout.'
 
 ## `timeout` Pipe and Endpoint
 
-The `timeout` Pipe consists two Nodes:
+The `timeout` Pipe consists of two Nodes:
   * `get_most_recent` 
   * `endpoint` 
 
@@ -65,8 +65,6 @@ This Node introduces query parameters for requesting data for a specific sensor 
 
 ```sql
 %
-
-%
 SELECT * FROM get_most_recent
 WHERE timestamp < NOW() - INTERVAL {{Int16(seconds,30,description="If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'.")}} SECONDS
    {% if defined(sensor_id) %}               
@@ -80,12 +78,9 @@ WHERE timestamp < NOW() - INTERVAL {{Int16(seconds,30,description="If a sensor h
 
 ## Introduction to ClickHouse time windows 
 
-While we are working with a simple concept, looking up the most recent data for a set of sensors, let's take this opportunity to start introducing [ClickHouse windows functions](https://clickhouse.com/docs/en/sql-reference/window-functions). 
+While we are working with the concept of looking up the most recent data for a set of sensors, let's take this opportunity to start introducing [ClickHouse windows functions](https://clickhouse.com/docs/en/sql-reference/window-functions). 
 
-Here we use the `ROW_NUMBER()` window function to assign a row number to each row within a partition defined by the id, ordering the rows by timestamp in descending order. This effectively ranks the rows for each id based on the timestamp, with the most recent timestamp receiving the row number 1.
-
-In the main query filters the rows based on the condition `row_num = 1`, selecting only the rows where the row number is equal to 1. This ensures that only the latest record for each id is included in the result set.
-
+The `timeout` method requies us to look up the single, most recent event for each sensor. Here is an alternative to the one above:
 
 ```sql
 
@@ -109,12 +104,14 @@ WHERE
 
 ```
 
+Here we use the `ROW_NUMBER()` window function to assign a row number to each row within a partition defined by the id, ordering the rows by timestamp in descending order. This effectively ranks the rows for each id based on the timestamp, with the most recent timestamp receiving the row number 1.
+
+The main query filters the rows based on the condition `row_num = 1`, selecting only the rows where the row number is equal to 1. This ensures that only the latest record for each id is included in the result set.
+
 We will revisit ClickHouse window functions when we discuss  [**rate-of-change** anomaly detection](rate-of-change.md). 
 
 
-sensor_5_anomaly_timeout
-
-## Example
+## Detection example
 
 Below is an example of detecting this type of anomaly. Here the 'timeout' is set to thirty seconds. When called, this endpoint confirms sensors have reported with this many seconds. 
 
