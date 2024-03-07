@@ -86,8 +86,9 @@ ORDER BY timestamp DESC
 
 ## Example
 
-Here is an example of detecting this type of anomaly:
+Here are twoan examples of detecting this type of anomaly:
 
 ![Rate-of-change anomaly detected](../charts/sensor_8_anomaly_rate-of-change.png)
 
+![Rate-of-change anomaly detected](../charts/sensor_9_anomaly_rate-of-change.png)
 

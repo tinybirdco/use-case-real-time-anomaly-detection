@@ -64,3 +64,15 @@ GROUP BY id
  ORDER BY timestamp DESC
 
 ```
+
+## Example
+
+Below is an example of detecting this type of anomaly. 
+
+API Endpoint query parameters:
+
+* detect_window_seconds = 60
+* stats_window_minutes = 5
+* iqr_multiplier = 1.5
+
+![Z-score anomaly detected](../charts/sensor_2_anomaly_interquartile-range.png)

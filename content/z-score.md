@@ -117,3 +117,16 @@ WHERE test = 'low' OR test = 'high'
  AND zscore < -1 * zscore_multiplier OR zscore > zscore_multiplier 
 ORDER by timestamp DESC
 ```
+
+## Example
+
+Below is an example of detecting this type of anomaly. 
+
+API Endpoint query parameters:
+
+* detect_window_seconds = 60
+* stats_window_minutes = 5
+* zscore = 2
+
+![Z-score anomaly detected](../charts/sensor_10_anomaly_z-score.png)
+
