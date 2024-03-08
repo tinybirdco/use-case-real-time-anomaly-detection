@@ -4,7 +4,7 @@
 
 [Endpoint documentation](https://api.tinybird.co/endpoint/t_f803a2aa360f486cb885333eaf93b016?token=p.eyJ1IjogIjJjOGIyYzQ2LTU4NzYtNGU5Mi1iNGJkLWMwNTliZDFhNzUwZSIsICJpZCI6ICJiZjYwZTgyZi1iNWFjLTRjMzgtODJkZS1iYzhjMmNiNTY4YWUiLCAiaG9zdCI6ICJldV9zaGFyZWQifQ.rXUC9lNg6Q4QKcbHL_OS73scKSuGzG6uCXG9qwBq8_s)
 
-Supported query parameters:
+**Query parameters:**
 
 * sensor_id - Used to select a single sensor of interest. Otherwise, returns results for all sensors.. 
 * seconds - If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'. Defaults to 30.
@@ -73,6 +73,14 @@ WHERE timestamp < NOW() - INTERVAL {{Int16(seconds,30,description="If a sensor h
 ```
 
 
+## Detection example
+
+Below is an example of detecting this type of anomaly. Here the 'timeout' is set to thirty seconds. When called, this endpoint confirms sensors have reported with this many seconds. 
+
+`https://api.tinybird.co/v0/pipes/timeout.json?sensor_id=1&seconds=30`
+
+![Timeout anomaly detected](../charts/sensor_5_anomaly_timeout.png)
+
 
 
 
@@ -110,13 +118,5 @@ The main query filters the rows based on the condition `row_num = 1`, selecting 
 
 We will revisit ClickHouse window functions when we discuss  [**rate-of-change** anomaly detection](rate-of-change.md). 
 
-
-## Detection example
-
-Below is an example of detecting this type of anomaly. Here the 'timeout' is set to thirty seconds. When called, this endpoint confirms sensors have reported with this many seconds. 
-
-`https://api.tinybird.co/v0/pipes/timeout.json?sensor_id=1&seconds=30`
-
-![Timeout anomaly detected](../charts/sensor_5_anomaly_timeout.png)
 
 

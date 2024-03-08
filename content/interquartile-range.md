@@ -1,7 +1,19 @@
 # Interquartile Range (IQR) anomalies
+
 #### Using quartiles to identify anomalies. 
 
 ##### Another method of generating data statistics to identify pattern changes, rather than triggering on single or pairs of isolated data points.
+
+[Endpoint documentation](https://api.tinybird.co/endpoint/t_23a80bc263c6453a94d26e2c538dc11a?token=p.eyJ1IjogIjJjOGIyYzQ2LTU4NzYtNGU5Mi1iNGJkLWMwNTliZDFhNzUwZSIsICJpZCI6ICJiZGE0MmIzZi1hOThiLTQwZDMtYmRmZC1jZWVjN2M2NDJlNWIiLCAiaG9zdCI6ICJldV9zaGFyZWQifQ.AGGMjpobLJ7cLArhbBKV8oASZI5ueveivJ4NuEuRHpE)
+
+**Query parameters:**
+* sensor_id - Used to select a single sensor of interest. Otherwise, returns results for all sensors. 
+* detection_window_seconds - Defines the time window (in seconds) for selecting data points to examine for anomalies.
+* stats_window_minutes - Defines the time window (in minutes) for calculating first and third quartiles used to calculate IQR.
+* iqr_multiplier - The multiplier of the IQR to set the range for testing for IQR anomalies.
+* max_per_sensor - Used to limit the number of IQR anomalies to return by sensor. 
+
+# Introduction
 
 The Interquartile Range (IQR) method is a valuable tool for identifying anomalies in real-time data by providing a standardized way to compare individual data points to the overall trend of the data. This method is effective for identifying outliers and anomalies in sensor data. When a sensor reading is outside of an IQR-based range, it indicates a deviation from the expected behavior. 
 
@@ -18,21 +30,23 @@ Data points that are below or above some level based on a multiplier of this IQR
 
 ## `iqr` Pipe and Endpoint
 
+The `iqr` Pipe consists of a single Node: 
+* `endpoint`
+
 The `iqr` Pipe is designed to be flexible by supporting the following API Endpoint query parameters:
 * **sensor_id** - Used to select a single sensor of interest.
-* **iqr_multiplier** - The threshold for determining Z-score outliers. Compared with absolute value of Z-score.
-* **stats_window_minutes** - Defines the time window (in minutes) for calculating data averages and standard deviations used to calculate Z-score.
 * **detect_window_seconds** - Defines the time window (in seconds) for selecting data points to examine for anomalies. If polling on an interval, this can be set to match that interval to minimize duplicate detections.
-* **max_per_sensor** - Used to limit the number of IQR anomalies to return by sensor.
+* **stats_window_minutes** - Defines the time window (in minutes) for calculating first and third quartiles used to calculate IQR.
+* **iqr_multiplier** - The multiplier of the IQR to set the range for testing for IQR anomalies
+* **max_per_sensor** - Used to limit the number of IQR anomalies to return by sensor. Most useful when requesting all sensors since the number of interquartile range anomaly detections can be high. [experimental!]
 
 ### `endpoint` Node
 
-The `endpoint` Node uses a Common Table Expression (CTE) to determine Q1 and Q3 for a time window of recent data based on the `_stats_window_minutes` parameter. This Node also implements the query parameter for selecting a sensor id of interest. 
+The `endpoint` Node uses a Common Table Expression (CTE) to determine Q1 and Q3 for a time window of recent data based on the `stats_window_minutes` parameter. This Node also implements the query parameter for selecting a sensor id of interest. 
 
-The main query JOINs with the `stats` CTE and tests each event within the `_detect_window_seconds` against the lower and upper bounds based on the IQR and the multiplier. 
+The main query JOINs with the `stats` CTE and tests each event within the `detect_window_seconds` against the lower and upper bounds based on the IQR and the multiplier. 
 
-There is also a `_max_per_sensor` parameter to limit the number anomaly events to return per sensor. When data is arriving many times a second, the anomaly events can get noisy when they start occurring. 
-
+There is also a `max_per_sensor` parameter to limit the number anomaly events to return per sensor. When data is arriving many times a second, the anomaly events can get noisy when they start occurring. 
 
 ```sql
 %
@@ -65,7 +79,7 @@ GROUP BY id
 
 ```
 
-## Example
+## Detection example
 
 Below is an example of detecting this type of anomaly. 
 
@@ -75,4 +89,4 @@ API Endpoint query parameters:
 * stats_window_minutes = 5
 * iqr_multiplier = 1.5
 
-![Z-score anomaly detected](../charts/sensor_2_anomaly_interquartile-range.png)
+![Interquartile range (IQR) anomaly detected](../charts/sensor_2_anomaly_interquartile-range.png)

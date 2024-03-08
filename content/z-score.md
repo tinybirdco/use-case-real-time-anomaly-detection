@@ -3,6 +3,16 @@
 
 ##### Another method of generating data statistics to identify pattern changes, rather than triggering on single or pairs of isolated data points.
 
+[Endpoint documentation](https://api.tinybird.co/endpoint/t_d729f1f129424c488b9aafd3eae53f9c?token=p.eyJ1IjogIjJjOGIyYzQ2LTU4NzYtNGU5Mi1iNGJkLWMwNTliZDFhNzUwZSIsICJpZCI6ICIyZDYyNjk5YS03NWY4LTQ5YzAtOTc5NS03ZTRmN2NkNWZkMmIiLCAiaG9zdCI6ICJldV9zaGFyZWQifQ.13_QjpzXuwJPo3n_KvCSIqejvNvwBGu6LSaEYEVPkGQ)
+
+**Query parameters:**
+* sensor_id - Used to select a single sensor of interest. Otherwise, returns results for all sensors. 
+* detection_window_seconds - Defines the time window (in seconds) for selecting data points to examine for anomalies.
+* stats_window_minutes - Defines the time window (in minutes) for calculating first and third quartiles used to calculate IQR.
+* zscore_threshold - The threshold for determining Z-score outliers, with scores higher than this detected as anomalies. Compared with absolute value of Z-score.
+
+## Introduction
+
 This recipe was inspired by [this previous Tinybird blog post about detecting anomalies with Z-scores](https://www.tinybird.co/blog-posts/anomaly-detection). 
 
 Z-scores are a valuable tool for identifying anomalies in real-time data by providing a standardized way to compare individual data points to the overall trend of the data. When a sensor reading exceeds a certain Z-Score threshold, it indicates a deviation from the expected behavior. This method is effective for identifying outliers and anomalies in sensor data.
@@ -18,10 +28,10 @@ where:
 * `stddev` is the standard deviation of the data within the same window.
 
 Currently, this Pipe is based on two time windows:
-1) First, the statistics are calculated across the `_stats_time_window_minutes` interval.
-2) Second, anomalies are scanned for using the `_detect_window_seconds` interval.
+1) First, the statistics are calculated across the `stats_time_window_minutes` interval.
+2) Second, anomalies are scanned for using the `detect_window_seconds` interval.
 
-Below the `zscore_multiplier defaults to 3, and this parameter is one to experiment with. 
+Below the `zscore_multiplier defaults to 2, and this parameter is one to experiment with. 
 
 Note:
 
@@ -31,7 +41,9 @@ Note:
 
 ## `z_score` Pipe and Endpoint
 
-The `z_score` Pipe consiste of two Nodes: `calculate_z_score` and `endpoint`.
+The `z_score` Pipe consiste of two Nodes: 
+* `calculate_z_score` 
+* `endpoint`
 
 The `z_score` Pipe is designed to be flexible by supporting the following API Endpoint query parameters:
 * **sensor_id** - Used to select a single sensor of interest.
@@ -118,7 +130,7 @@ WHERE test = 'low' OR test = 'high'
 ORDER by timestamp DESC
 ```
 
-## Example
+## Detection example
 
 Below is an example of detecting this type of anomaly. 
 
