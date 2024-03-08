@@ -17,24 +17,41 @@ SQL >
           timestamp, 
           value
         FROM incoming_data
-        ORDER BY timestamp DESC 
+        ORDER BY timestamp DESC
         LIMIT 1 BY id
 
 
 
 NODE endpoint
 DESCRIPTION >
-    Determine if any sensors have not reported in the specified time window.
+    Determine if any sensors have not reported in the specified time window
+    {% set _timeout_seconds = 30 %}
 
 SQL >
 
     %
-
-    {% set _timeout_seconds = 30 %}  
     SELECT * FROM get_most_recent
-    WHERE timestamp < NOW() - INTERVAL {{Int16(seconds,_timeout_seconds,description="If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'.")}} SECONDS
+    WHERE timestamp < NOW() - INTERVAL {{Int16(seconds,30,description="If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'. Defaults to 30.")}} SECONDS
+       {% if defined(sensor_id) %}               
+          AND id = {{ Int32(sensor_id, description="Used to select a single sensor of interest. Otherwise, returns results for all sensors.")}} 
+       {% end %}  
+
+
+
+NODE single_node
+SQL >
+
+    %
+
+    SELECT id, 
+          timestamp, 
+          value
+        FROM incoming_data
+         WHERE timestamp < NOW() - INTERVAL {{Int16(seconds,30,description="If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'.")}} SECONDS
        {% if defined(sensor_id) %}               
           AND id = {{ Int32(sensor_id, description="Used to select a single sensor of interest. Optional.")}} 
        {% end %}  
+        ORDER BY timestamp DESC 
+        LIMIT 1 BY id
 
 

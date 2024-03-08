@@ -35,9 +35,9 @@ SQL >
       lagInFrame(value, 1) OVER
         (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_value
     FROM incoming_data
-    WHERE timestamp > NOW() - INTERVAL {{Int16(detect_window_seconds, _detect_window_seconds_default, description="Search this many most recent minutes of the data history.")}} SECOND
+    WHERE timestamp > NOW() - INTERVAL {{Int16(detect_window_seconds, _detect_window_seconds_default, description="Integer. Examine this many seconds of the most recent data history.")}} SECOND
       {% if defined(sensor_id) %}               
-        AND id = {{ Int32(sensor_id)}}
+        AND id = {{ Int32(sensor_id,description="Used to select a single sensor of interest. Otherwise, returns results for all sensors.")}}
       {% end %}    
     ORDER BY timestamp DESC
 

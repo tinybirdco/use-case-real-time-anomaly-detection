@@ -6,8 +6,8 @@
 
 **Query parameters:**
 
-* sensor_id - Used to select a single sensor of interest. Otherwise, returns results for all sensors.. 
-* seconds - If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'. Defaults to 30.
+* **sensor_id** - Used to select a single sensor of interest. Otherwise, returns results for all sensors.. 
+* **seconds** - If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'. Defaults to 30.
 
 ## Introduction
 

@@ -25,7 +25,7 @@ NODE get_anomaly_types
 SQL >
 
     SELECT anomaly_type
-    FROM copy_log_duplicates
+    FROM copy_log
     GROUP BY anomaly_type
 
 

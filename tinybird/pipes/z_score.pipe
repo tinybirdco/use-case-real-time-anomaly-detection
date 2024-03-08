@@ -31,7 +31,7 @@ SQL >
          (i.value - stats.average)/stats.stddev AS zscore,
          stats.average,
          stats.stddev,
-         {{Float32(zscore_threshold, _zscore_threshold_default, description="The threshold for determining Z-score outliers. Compared with absolute value of Z-score.")}} AS zscore_multiplier
+         {{Float32(zscore_threshold, _zscore_threshold_default, description="Floating point number. The threshold for determining Z-score outliers, with scores higher than this detected as anomalies. Compared with absolute value of Z-score.")}} AS zscore_multiplier
     FROM incoming_data i
     JOIN stats s ON s.id = i.id
     WHERE timestamp BETWEEN NOW() - interval {{Int32(detect_window_seconds, _detect_window_seconds_default, description="Defines the time window (in SECONDS) for selecting data points to examine for anomalies. If polling on an interval, this can be set to match that interval to minimize duplicate detections.")}} SECOND AND NOW()

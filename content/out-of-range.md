@@ -5,10 +5,10 @@
 [Endpoint documentation](https://api.tinybird.co/endpoint/t_89b4aa3c33d24e82b599e69a1e73a421?token=p.eyJ1IjogIjJjOGIyYzQ2LTU4NzYtNGU5Mi1iNGJkLWMwNTliZDFhNzUwZSIsICJpZCI6ICJiMjM5ZGZmMC01YjdjLTQzNTQtOWY3MC1jMGIzZTE2M2VlNGYiLCAiaG9zdCI6ICJldV9zaGFyZWQifQ.-nNRyprUmEpK0tvElyljtfWCcyjW351dw17Z_FiaclQ)
 
 **Query parameters:**
-* sensor_id - Used to select a single sensor of interest. Otherwise, returns results for all sensors. 
-* detection_window_seconds - Examine this many seconds of the most recent data history.
-* min_value - Minimum threshold, readings less than this number will be detected as anomalies.
-* max_value - Maximum threshold, readings greater than this number will be detected as anomalies.
+* **sensor_id** - Used to select a single sensor of interest. Otherwise, returns results for all sensors. 
+* **detection_window_seconds** - Examine this many seconds of the most recent data history.
+* **min_value** - Minimum threshold, readings less than this number will be detected as anomalies.
+* **max_value** - Maximum threshold, readings greater than this number will be detected as anomalies.
 
 ## Introduction
 

@@ -6,10 +6,10 @@
 [Endpoint documentation](https://api.tinybird.co/endpoint/t_d729f1f129424c488b9aafd3eae53f9c?token=p.eyJ1IjogIjJjOGIyYzQ2LTU4NzYtNGU5Mi1iNGJkLWMwNTliZDFhNzUwZSIsICJpZCI6ICIyZDYyNjk5YS03NWY4LTQ5YzAtOTc5NS03ZTRmN2NkNWZkMmIiLCAiaG9zdCI6ICJldV9zaGFyZWQifQ.13_QjpzXuwJPo3n_KvCSIqejvNvwBGu6LSaEYEVPkGQ)
 
 **Query parameters:**
-* sensor_id - Used to select a single sensor of interest. Otherwise, returns results for all sensors. 
-* detection_window_seconds - Defines the time window (in seconds) for selecting data points to examine for anomalies.
-* stats_window_minutes - Defines the time window (in minutes) for calculating first and third quartiles used to calculate IQR.
-* zscore_threshold - The threshold for determining Z-score outliers, with scores higher than this detected as anomalies. Compared with absolute value of Z-score.
+* **sensor_id** - Used to select a single sensor of interest. Otherwise, returns results for all sensors. 
+* **detection_window_seconds** - Defines the time window (in seconds) for selecting data points to examine for anomalies.
+* **stats_window_minutes** - Defines the time window (in minutes) for calculating first and third quartiles used to calculate IQR.
+* **zscore_threshold** - The threshold for determining Z-score outliers, with scores higher than this detected as anomalies. Compared with absolute value of Z-score.
 
 ## Introduction
 

@@ -6,9 +6,9 @@
 
 **Query parameters:**
 
-* sensor_id - Used to select a single sensor of interest. Otherwise, returns results for all sensors. 
-* detection_window_seconds - Examine this many seconds of the most recent data history.
-* max_slope - Maximum slope, any events with a rate-of-change higher than this is flagged as an anomaly.
+* **sensor_id** - Used to select a single sensor of interest. Otherwise, returns results for all sensors. 
+* **detection_window_seconds** - Examine this many seconds of the most recent data history.
+* **max_slope** - Maximum slope, any events with a rate-of-change higher than this is flagged as an anomaly.
 
 ## Introduction
 

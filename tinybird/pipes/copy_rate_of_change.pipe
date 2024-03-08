@@ -38,9 +38,6 @@ SQL >
     OVER (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_value
     FROM incoming_data
     WHERE timestamp > NOW() - INTERVAL {{_detect_window_seconds}} SECONDS
-      {% if defined(sensor_id) %}               
-        AND id = {{ Int32(sensor_id)}}
-      {% end %}    
     ORDER BY timestamp DESC
 
 

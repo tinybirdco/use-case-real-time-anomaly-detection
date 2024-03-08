@@ -17,8 +17,8 @@ SQL >
     {% set _detect_window_seconds_default = 600 %}
 
     SELECT id, timestamp, value, 
-       {{Int16(min_value, _min_value_default, description="Integer. Minimum threshold, will match readings less than this number.",required=False)}} as min_value, 
-       {{Int16(max_value, _max_value_default, description="Integer. Maximum threshold, will match readings greater than this number.",required=False)}} as max_value 
+       {{Int16(min_value, _min_value_default, description="Integer. Minimum threshold, readings less than this number will be detected as anomalies.",required=False)}} as min_value, 
+       {{Int16(max_value, _max_value_default, description="Integer. Maximum threshold, readings greater than this number will be detected as anomalies.",required=False)}} as max_value 
     FROM incoming_data
     WHERE value < min_value OR value > max_value
     {% if defined(sensor_id) %}               

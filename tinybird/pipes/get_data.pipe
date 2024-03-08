@@ -13,7 +13,7 @@ SQL >
     %
     SELECT * 
     FROM incoming_data
-    WHERE timestamp > addHours(NOW(), -{{ Int16(hours,24,description='How many hours of event data to return.')}})
+    WHERE timestamp > addMinutes(NOW(), -{{ Int16(minutes,24,description='How many minutes of event data to return.')}})
     {% if defined(sensor_id) %}
          AND id = {{ Int16(sensor_id,description='Sensor ID to return.')}}
       {% end %}

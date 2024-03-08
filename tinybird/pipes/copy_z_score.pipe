@@ -18,7 +18,7 @@ SQL >
 
     %
     {% set _zscore_multipler=2 %}  # A multipler used to determine Z-score outliers. 
-    {% set _stats_window_minutes=10 %}  # Statistical quartiles are based on this most recent window.
+    {% set _stats_window_minutes=10 %}  # Statistical averages and standard deviations are based on this most recent window.
     {% set _detect_window_seconds=61 %} # This Pipe makes a copy every minute, so selecting events since last copy plus one minute.  
 
     WITH stats AS (

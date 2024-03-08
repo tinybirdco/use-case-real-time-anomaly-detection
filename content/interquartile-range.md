@@ -7,11 +7,11 @@
 [Endpoint documentation](https://api.tinybird.co/endpoint/t_23a80bc263c6453a94d26e2c538dc11a?token=p.eyJ1IjogIjJjOGIyYzQ2LTU4NzYtNGU5Mi1iNGJkLWMwNTliZDFhNzUwZSIsICJpZCI6ICJiZGE0MmIzZi1hOThiLTQwZDMtYmRmZC1jZWVjN2M2NDJlNWIiLCAiaG9zdCI6ICJldV9zaGFyZWQifQ.AGGMjpobLJ7cLArhbBKV8oASZI5ueveivJ4NuEuRHpE)
 
 **Query parameters:**
-* sensor_id - Used to select a single sensor of interest. Otherwise, returns results for all sensors. 
-* detection_window_seconds - Defines the time window (in seconds) for selecting data points to examine for anomalies.
-* stats_window_minutes - Defines the time window (in minutes) for calculating first and third quartiles used to calculate IQR.
-* iqr_multiplier - The multiplier of the IQR to set the range for testing for IQR anomalies.
-* max_per_sensor - Used to limit the number of IQR anomalies to return by sensor. 
+* **sensor_id** - Used to select a single sensor of interest. Otherwise, returns results for all sensors. 
+* **detection_window_seconds** - Defines the time window (in seconds) for selecting data points to examine for anomalies.
+* **stats_window_minutes** - Defines the time window (in minutes) for calculating first and third quartiles used to calculate IQR.
+* **iqr_multiplier** - The multiplier of the IQR to set the range for testing for IQR anomalies.
+* **max_per_sensor** - Used to limit the number of IQR anomalies to return by sensor. 
 
 # Introduction
 
