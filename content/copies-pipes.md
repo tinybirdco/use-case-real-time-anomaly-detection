@@ -2,7 +2,7 @@
 
 To start this discussion, let's describe what [Copy Pipes](https://www.tinybird.co/docs/publish/copy-pipes.html#copy-pipes) are. In any Pipe, a single Node can be selected to make a copy of its results and write them into a Data Source. This *Copy Pipe* process can be triggered on demand, or on a selected interval. 
 
-### Considering the number of endpoints 
+### Considering the number of endpoints to report on all anomaly types
 
 As part of this project, we have five API Endpoints that scan for and return anomalies, one for each anomaly type. These endpoints provide flexible ways to detect anomalies in real-time time-series data. 
 
@@ -12,11 +12,11 @@ Collectively, they support query parameters for selecting sensors of interest, s
 
 The drawback of having five separate endpoints is that they all need to be polled to get the most comprehensive view of anomaly detections. If you have a critical anomaly type monitored on a per-minute interval, that is 1,440 requests per day. If each request processes 5 MB of data, that is 7.2 GB of processed data per day. If you want to integrate all five endpoints, that is 7,200 requests and 36 GB of processed data per day. 
 
-Fortunately, it is possible to iterate queries to decrease the amount of data they proess. Already, some of the detection Pipes use very little processed data. For example, the `rate_of_change` and `z_score` Pipes use around 100 KB per call or 144 MB per day when polling every minute. 
+Fortunately, it is usually possible to iterate queries to decrease the amount of data they process. Already, some of the detection Pipes use very little processed data. For example, the `rate_of_change` and `z_score` Pipes use around 100 KB per call or 144 MB per day when polling every minute. 
 
-While reviewing queries to make them more efficient is a critical path for implementing an anomaly detection system, there is also a fundamental design that can dramatically reduce the number of requests needed to monitor all anomaly types. 
+While reviewing queries to make them more efficient is a critical step for implementing an anomaly detection system, there is also a fundamental design that can dramatically reduce the number of requests needed to monitor all anomaly types. 
 
-### Can we build a Data Source that compiles anomaly detections of all types? 
+### Can we build a single API Endpoint to return detections for all anomaly types? 
 
 It would be useful to have a single endpoint that shared all detection events across every anomaly type. Instead of five separate endpoints, a single endpoint would require 80% less requests to integrate all types.  
 
