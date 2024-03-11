@@ -1,0 +1,2824 @@
+{
+    "annotations": {
+      "list": [
+        {
+          "builtIn": 1,
+          "datasource": {
+            "type": "grafana",
+            "uid": "-- Grafana --"
+          },
+          "enable": true,
+          "hide": true,
+          "iconColor": "rgba(0, 211, 255, 1)",
+          "name": "Annotations & Alerts",
+          "type": "dashboard"
+        }
+      ]
+    },
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "id": 28,
+    "links": [],
+    "liveNow": true,
+    "panels": [
+      {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 2,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "noValue": "x",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 7,
+          "x": 0,
+          "y": 0
+        },
+        "id": 3,
+        "options": {
+          "legend": {
+            "calcs": [
+              "firstNotNull",
+              "lastNotNull",
+              "min",
+              "max",
+              "mean"
+            ],
+            "displayMode": "table",
+            "placement": "bottom",
+            "showLegend": true
+          },
+          "timezone": [
+            "America/Denver"
+          ],
+          "tooltip": {
+            "maxHeight": 600,
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "targets": [
+          {
+            "cacheDurationSeconds": 5,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "language": "jsonpath",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "sensor_id",
+                "${sensor_id}"
+              ],
+              [
+                "token",
+                ""
+              ]
+            ],
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": "/v0/pipes/get_data.json"
+          }
+        ],
+        "title": "Selected sensor time-series",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "palette-classic"
+            },
+            "custom": {
+              "axisBorderShow": false,
+              "axisCenteredZero": false,
+              "axisColorMode": "text",
+              "axisLabel": "",
+              "axisPlacement": "auto",
+              "barAlignment": 0,
+              "drawStyle": "line",
+              "fillOpacity": 0,
+              "gradientMode": "none",
+              "hideFrom": {
+                "legend": false,
+                "tooltip": false,
+                "viz": false
+              },
+              "insertNulls": false,
+              "lineInterpolation": "linear",
+              "lineWidth": 2,
+              "pointSize": 5,
+              "scaleDistribution": {
+                "type": "linear"
+              },
+              "showPoints": "auto",
+              "spanNulls": false,
+              "stacking": {
+                "group": "A",
+                "mode": "none"
+              },
+              "thresholdsStyle": {
+                "mode": "off"
+              }
+            },
+            "mappings": [],
+            "noValue": "x",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": []
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 11,
+          "x": 7,
+          "y": 0
+        },
+        "id": 2,
+        "options": {
+          "legend": {
+            "calcs": [
+              "firstNotNull",
+              "last",
+              "min",
+              "max",
+              "mean"
+            ],
+            "displayMode": "table",
+            "placement": "right",
+            "showLegend": true
+          },
+          "timezone": [
+            "America/Denver"
+          ],
+          "tooltip": {
+            "maxHeight": 600,
+            "mode": "single",
+            "sort": "none"
+          }
+        },
+        "targets": [
+          {
+            "cacheDurationSeconds": 5,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "language": "jsonpath",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "1"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "Sensor 1",
+            "urlPath": "/v0/pipes/get_data.json"
+          },
+          {
+            "cacheDurationSeconds": 300,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "hide": false,
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "2"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "Sensor 2",
+            "urlPath": "/v0/pipes/get_data.json"
+          },
+          {
+            "cacheDurationSeconds": 300,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "hide": false,
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "3"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "Sensor 3",
+            "urlPath": "/v0/pipes/get_data.json"
+          },
+          {
+            "cacheDurationSeconds": 300,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "hide": false,
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "4"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "Sensor 4",
+            "urlPath": "/v0/pipes/get_data.json"
+          },
+          {
+            "cacheDurationSeconds": 300,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "hide": false,
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "5"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "Sensor 5",
+            "urlPath": "/v0/pipes/get_data.json"
+          },
+          {
+            "cacheDurationSeconds": 300,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "hide": false,
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "6"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "Sensor 6",
+            "urlPath": "/v0/pipes/get_data.json"
+          },
+          {
+            "cacheDurationSeconds": 300,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "hide": false,
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "7"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "Sensor 7",
+            "urlPath": "/v0/pipes/get_data.json"
+          },
+          {
+            "cacheDurationSeconds": 300,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "hide": false,
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "8"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "Sensor 8",
+            "urlPath": "/v0/pipes/get_data.json"
+          },
+          {
+            "cacheDurationSeconds": 300,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "hide": false,
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "9"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "Sensor 9",
+            "urlPath": "/v0/pipes/get_data.json"
+          },
+          {
+            "cacheDurationSeconds": 300,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "hide": false,
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "10"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "Sensor 10",
+            "urlPath": "/v0/pipes/get_data.json"
+          }
+        ],
+        "title": "All sensors time-series ",
+        "type": "timeseries"
+      },
+      {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "noValue": "x",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "id"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "timestamp"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 170
+                },
+                {
+                  "id": "decimals",
+                  "value": 0
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 90
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 10,
+          "w": 5,
+          "x": 18,
+          "y": 0
+        },
+        "id": 1,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true
+        },
+        "pluginVersion": "11.0.0-67746",
+        "targets": [
+          {
+            "cacheDurationSeconds": 5,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].id",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "language": "jsonpath",
+                "name": "",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "sensor_id",
+                "${sensor_id}"
+              ],
+              [
+                "token",
+                ""
+              ]
+            ],
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": "/v0/pipes/most_recent.json"
+          }
+        ],
+        "title": "Most recent data",
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "noValue": "x",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "id"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "timestamp"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 170
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "slope"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 130
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 100
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "value_diff"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 120
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 13,
+          "x": 0,
+          "y": 10
+        },
+        "id": 15,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true
+        },
+        "pluginVersion": "11.0.0-67746",
+        "targets": [
+          {
+            "cacheDurationSeconds": 5,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].id",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "language": "jsonpath",
+                "name": "",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].anomaly_type",
+                "language": "jsonpath",
+                "name": "Anomaly type",
+                "type": "string"
+              },
+              {
+                "jsonPath": "$.data[*].note",
+                "language": "jsonpath",
+                "name": "Summary",
+                "type": "string"
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "${sensor_id}"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": "/v0/pipes/monitor_logs.json"
+          }
+        ],
+        "title": "Anomaly detections",
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "noValue": "x",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "id"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "timestamp"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 170
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "slope"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 130
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 100
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "value_diff"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 120
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 13,
+          "y": 10
+        },
+        "id": 8,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true
+        },
+        "pluginVersion": "11.0.0-67746",
+        "targets": [
+          {
+            "cacheDurationSeconds": 5,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].id",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "language": "jsonpath",
+                "name": "",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].slope",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].value_diff",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "${sensor_id}"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": "/v0/pipes/rate_of_change.json"
+          }
+        ],
+        "title": "Rate-of-change (slope) outliers (in last 30 minutes)",
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "noValue": "x",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "id"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 20
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Last report"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 170
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 120
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 4,
+          "x": 19,
+          "y": 10
+        },
+        "id": 6,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true
+        },
+        "pluginVersion": "11.0.0-67746",
+        "targets": [
+          {
+            "cacheDurationSeconds": 5,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].id",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "language": "jsonpath",
+                "name": "Last report",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ]
+            ],
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": "/v0/pipes/timeout.json"
+          }
+        ],
+        "title": "Timedout sensors",
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "noValue": "x",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "id"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "timestamp"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 200
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 100
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Lower IQR bound"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 140
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Upper IQR bound"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 140
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 0,
+          "y": 18
+        },
+        "id": 5,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true
+        },
+        "pluginVersion": "11.0.0-67746",
+        "targets": [
+          {
+            "cacheDurationSeconds": 5,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].id",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "language": "jsonpath",
+                "name": "",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].lower_bound",
+                "language": "jsonpath",
+                "name": "Lower IQR bound",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].upper_bound",
+                "language": "jsonpath",
+                "name": "Upper IQR bound"
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "${sensor_id}"
+              ],
+              [
+                "iqr_multiplier",
+                "1.5"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": "/v0/pipes/iqr.json"
+          }
+        ],
+        "title": "IQR anomalies (in last 10 minutes)",
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "noValue": "x",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "id"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "timestamp"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 160
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "min_value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 100
+                },
+                {
+                  "id": "decimals",
+                  "value": 0
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "max_value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 100
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 120
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 6,
+          "y": 18
+        },
+        "id": 7,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true
+        },
+        "pluginVersion": "11.0.0-67746",
+        "targets": [
+          {
+            "cacheDurationSeconds": 5,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].id",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "language": "jsonpath",
+                "name": "",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].min_value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].max_value",
+                "language": "jsonpath",
+                "name": ""
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "${sensor_id}"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": "/v0/pipes/out_of_range.json"
+          }
+        ],
+        "title": "Threshold outliers (in last 30 minutes)",
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "noValue": "x",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green",
+                  "value": null
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "id"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "timestamp"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 200
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 66
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "zscore"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 80
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 6,
+          "x": 12,
+          "y": 18
+        },
+        "id": 4,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true
+        },
+        "pluginVersion": "11.0.0-67746",
+        "targets": [
+          {
+            "cacheDurationSeconds": 5,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].id",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "language": "jsonpath",
+                "name": "",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].test",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].zscore",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "${sensor_id}"
+              ],
+              [
+                "zscore_threshold",
+                "3"
+              ],
+              [
+                "stats_window_minutes",
+                "10"
+              ],
+              [
+                "detect_window_seconds",
+                "600"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": "/v0/pipes/z_score.json"
+          }
+        ],
+        "title": "Simple Z-score anomalies (in last 10-minutes)",
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "noValue": "x",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green"
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "id"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "timestamp"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 170
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 100
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "anomaly_type"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 120
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "note"
+              },
+              "properties": [
+                {
+                  "id": "custom.width"
+                },
+                {
+                  "id": "custom.align",
+                  "value": "left"
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 8,
+          "w": 16,
+          "x": 0,
+          "y": 26
+        },
+        "id": 13,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true,
+          "sortBy": []
+        },
+        "pluginVersion": "11.0.0-67746",
+        "targets": [
+          {
+            "cacheDurationSeconds": 5,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].id",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "language": "jsonpath",
+                "name": "",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].anomaly_type",
+                "language": "jsonpath",
+                "name": "",
+                "type": "string"
+              },
+              {
+                "jsonPath": "$.data[*].note",
+                "language": "jsonpath",
+                "name": "",
+                "type": "string"
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ],
+              [
+                "sensor_id",
+                "${sensor_id}"
+              ]
+            ],
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": "/v0/pipes/monitor_logs.json"
+          }
+        ],
+        "title": "Most recent 100 anomalies (compiled from Copy Pipes)",
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "noValue": "x",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green"
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "id"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "timestamp"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 200
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 100
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Lower IQR bound"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 140
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "Upper IQR bound"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 140
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 9,
+          "w": 9,
+          "x": 0,
+          "y": 34
+        },
+        "id": 9,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true
+        },
+        "pluginVersion": "11.0.0-67429",
+        "targets": [
+          {
+            "cacheDurationSeconds": 5,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].id",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "language": "jsonpath",
+                "name": "",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].lower_bound",
+                "language": "jsonpath",
+                "name": "Lower IQR bound",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].upper_bound",
+                "language": "jsonpath",
+                "name": "Upper IQR bound"
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ]
+            ],
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": "/v0/pipes/iqr.json"
+          }
+        ],
+        "title": "IQR anomalies (in last 10 minutes) - All sensors",
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+        },
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "noValue": "x",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green"
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "id"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "timestamp"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 200
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "test"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "zscore"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 80
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 9,
+          "w": 9,
+          "x": 0,
+          "y": 43
+        },
+        "id": 10,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true
+        },
+        "pluginVersion": "11.0.0-67429",
+        "targets": [
+          {
+            "cacheDurationSeconds": 5,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].id",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "language": "jsonpath",
+                "name": "",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].test",
+                "language": "jsonpath",
+                "name": "",
+                "type": "string"
+              },
+              {
+                "jsonPath": "$.data[*].zscore",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ]
+            ],
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": "/v0/pipes/z_score.json"
+          }
+        ],
+        "title": "Simple Z-score anomalies (in last 10-minutes) - All sensors",
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "noValue": "x",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green"
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "id"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "timestamp"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 170
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "slope"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 130
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 100
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "value_diff"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 120
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 9,
+          "w": 9,
+          "x": 0,
+          "y": 52
+        },
+        "id": 11,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true
+        },
+        "pluginVersion": "11.0.0-67429",
+        "targets": [
+          {
+            "cacheDurationSeconds": 5,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].id",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "language": "jsonpath",
+                "name": "",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].slope",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].value_diff",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ]
+            ],
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": "/v0/pipes/rate_of_change.json"
+          }
+        ],
+        "title": "Rate-of-change (slope) outliers (in last 30 minutes) - All sensors",
+        "type": "table"
+      },
+      {
+        "datasource": {
+          "type": "marcusolsson-json-datasource",
+          "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+        },
+        "description": "",
+        "fieldConfig": {
+          "defaults": {
+            "color": {
+              "mode": "thresholds"
+            },
+            "custom": {
+              "align": "auto",
+              "cellOptions": {
+                "type": "auto"
+              },
+              "inspect": false
+            },
+            "mappings": [],
+            "noValue": "x",
+            "thresholds": {
+              "mode": "absolute",
+              "steps": [
+                {
+                  "color": "green"
+                },
+                {
+                  "color": "red",
+                  "value": 80
+                }
+              ]
+            }
+          },
+          "overrides": [
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "id"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 20
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "timestamp"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 160
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "min_value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 100
+                },
+                {
+                  "id": "decimals",
+                  "value": 0
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "max_value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 100
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                }
+              ]
+            },
+            {
+              "matcher": {
+                "id": "byName",
+                "options": "value"
+              },
+              "properties": [
+                {
+                  "id": "custom.width",
+                  "value": 120
+                },
+                {
+                  "id": "custom.align",
+                  "value": "center"
+                },
+                {
+                  "id": "decimals",
+                  "value": 2
+                }
+              ]
+            }
+          ]
+        },
+        "gridPos": {
+          "h": 9,
+          "w": 9,
+          "x": 0,
+          "y": 61
+        },
+        "id": 14,
+        "options": {
+          "cellHeight": "sm",
+          "footer": {
+            "countRows": false,
+            "fields": "",
+            "reducer": [
+              "sum"
+            ],
+            "show": false
+          },
+          "showHeader": true
+        },
+        "pluginVersion": "11.0.0-67429",
+        "targets": [
+          {
+            "cacheDurationSeconds": 5,
+            "datasource": {
+              "type": "marcusolsson-json-datasource",
+              "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+            },
+            "fields": [
+              {
+                "jsonPath": "$.data[*].id",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].timestamp",
+                "language": "jsonpath",
+                "name": "",
+                "type": "time"
+              },
+              {
+                "jsonPath": "$.data[*].value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].min_value",
+                "language": "jsonpath",
+                "name": "",
+                "type": "number"
+              },
+              {
+                "jsonPath": "$.data[*].max_value",
+                "language": "jsonpath",
+                "name": ""
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ]
+            ],
+            "queryParams": "",
+            "refId": "A",
+            "urlPath": "/v0/pipes/out_of_range.json"
+          }
+        ],
+        "title": "Threshold outliers (in last 30 minutes) - All sensors",
+        "type": "table"
+      }
+    ],
+    "schemaVersion": 39,
+    "tags": [],
+    "templating": {
+      "list": [
+        {
+          "current": {
+            "selected": false,
+            "text": "1",
+            "value": "1"
+          },
+          "datasource": {
+            "type": "marcusolsson-json-datasource",
+            "uid": "af15b280-4338-451a-9b9e-07ebeb6479f3"
+          },
+          "definition": "$.data[*].id",
+          "hide": 0,
+          "includeAll": false,
+          "multi": false,
+          "name": "sensor_id",
+          "options": [],
+          "query": {
+            "cacheDurationSeconds": 300,
+            "fields": [
+              {
+                "jsonPath": "$.data[*].id"
+              }
+            ],
+            "method": "GET",
+            "params": [
+              [
+                "token",
+                ""
+              ]
+            ],
+            "queryParams": "",
+            "urlPath": "/v0/pipes/ui_ids.json"
+          },
+          "refresh": 1,
+          "regex": "",
+          "skipUrlSync": false,
+          "sort": 3,
+          "type": "query"
+        }
+      ]
+    },
+    "time": {
+      "from": "2024-03-11T22:29:38.000Z",
+      "to": "2024-03-11T22:53:29.000Z"
+    },
+    "timeRangeUpdatedDuringEditOrView": false,
+    "timepicker": {
+      "nowDelay": "5s"
+    },
+    "timezone": "",
+    "title": "Anomaly Detection",
+    "uid": "d37b3edb-a665-4f8a-8b51-6577eded9ba4",
+    "version": 54,
+    "weekStart": ""
+  }

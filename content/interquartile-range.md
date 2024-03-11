@@ -50,32 +50,36 @@ There is also a `max_per_sensor` parameter to limit the number anomaly events to
 
 ```sql
 %
-{% set _iqr_multipler=1.5 %}  # A multipler used to determine the IQR value. 
-{% set _stats_window_minutes=10 %}  # Statistical quartiles are based on this most recent window.
-{% set _detect_window_seconds=600 %} # For each request, we look back 10 minutes. 
+{% set _iqr_multiplier=1.5 %}  # A multipler used to determine the IQR value. 
+{% set _stats_window_minutes_default=10 %}  # Statistical quartiles are based on this most recent window.
+{% set _detect_window_seconds_default=600 %} # For each request, we look back 10 minutes. 
+{% set _max_per_sensor = 10 %}  # A maximum number of IQR anomaly events to report per sensor. 
 
 WITH stats AS (SELECT id,
    quantileExact(0.25) (value) AS lower_quartile,
+   # quantileExact(0.5) (value) AS mid_quartile,  # Not needed.
    quantileExact(0.75) (value) AS upper_quartile,
-   (upper_quartile - lower_quartile) * {{_iqr_multipler}} AS IQR
+   (upper_quartile - lower_quartile) * {{Float32(iqr_multiplier, _iqr_multiplier, description = "The multiplier of the IQR to set the range for testing for IQR anomalies.")}} AS IQR
 FROM incoming_data
-WHERE timestamp >= toDate(NOW()) - INTERVAL {{Int16(_stats_window_minutes)}} MINUTES
+WHERE timestamp BETWEEN (NOW() - INTERVAL {{Int16(stats_window_minutes, _stats_window_minutes_default ,description="Defines the time window (in MINUTES) for calculating data averages and standard deviations used to calculate Z-score")}} MINUTE) AND NOW()
   {% if defined(sensor_id) %}               
-    AND id = {{ Int32(sensor_id)}}
+    AND id = {{ Int32(sensor_id, description="Used to select a single sensor of interest. ")}}
   {% end %}    
 GROUP BY id
 )
  SELECT DISTINCT timestamp, 
     id, 
     value, 
+    ROUND(stats.IQR,2) AS IQR,       
     ROUND((stats.lower_quartile - stats.IQR),2) AS lower_bound, 
     ROUND((stats.upper_quartile + stats.IQR),2) AS upper_bound 
  FROM incoming_data
  JOIN stats ON incoming_data.id = stats.id
- WHERE timestamp >= toDate(NOW()) - INTERVAL {{Int16(_detect_window_seconds)}} SECONDS
+ WHERE timestamp BETWEEN NOW() - interval {{Int32(detect_window_seconds, _detect_window_seconds_default, description="Defines the time window (in SECONDS) for selecting data points to examine for anomalies. If polling on an interval, this can be set to match that interval to minimize duplicate detections.")}} SECOND AND NOW()
  AND (value > (stats.upper_quartile + stats.IQR)
  OR value < (stats.lower_quartile - stats.IQR))
  ORDER BY timestamp DESC
+ LIMIT {{Int16(max_per_sensor,_max_per_sensor, description="Used to limit the number of IQR anomalies to return by sensor.")}} BY id
 
 ```
 

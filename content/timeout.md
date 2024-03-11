@@ -17,7 +17,7 @@ The 'recipe' for detecting timeouts starts with looking up the **most recent** r
 
 ## Selecting more recent reports
 
-The following query selects for the most recent report from every sensor. It relies on the ClickHouse-provided `LIMIT # BY field` statement. 
+The following query selects for the most recent report from every sensor. It relies on the ClickHouse-provided [`LIMIT # BY field` statement](https://clickhouse.com/docs/en/sql-reference/statements/select/limit-by). 
 
 ```sql
 
@@ -116,7 +116,7 @@ Here we use the `ROW_NUMBER()` window function to assign a row number to each ro
 
 The main query filters the rows based on the condition `row_num = 1`, selecting only the rows where the row number is equal to 1. This ensures that only the latest record for each id is included in the result set.
 
-We will revisit ClickHouse window functions when we discuss  [**rate-of-change** anomaly detection](rate-of-change.md). 
+We will revisit ClickHouse window functions when we discuss  [**rate-of-change** anomaly detection](rate-of-change.md). For the rate-of-change recipe, the window function span is increased to two in order to grab the most recent event along with the one immediately before it. 
 
 
 
