@@ -6,15 +6,15 @@ This project is a collection of content in support of demonstrating how Tinybird
 
 ## Introduction
 
-Anomalies, or outliers, in data can often signify critical events, deviations from expected behavior, or potential issues that require immediate attention. Detecting these anomalies in real-time enables you to take proactive measures, mitigate risks, and optimize operations. In this project we demonstrate how various types of anomalies can be detected and flagged in streaming data.
+Anomalies, or outliers, in data can often signify critical events, deviations from expected behavior, or infrastructure breakdowns. Detecting these anomalies in real-time enables you to take proactive measures, mitigate risks, and optimize operations. In this project we demonstrate how various types of anomalies can be detected and flagged in streaming data.
 
-The project focuses on five types of anomalies:
+The project focuses on dectecting five types of anomalies:
 
 * **Out-of-range**: Identifying data points that fall outside a specified valid range.
 * **Rate-of-change**: Detecting abrupt changes or spikes in the rate of change of data.
 * **Timeout**: Flagging data points that cease to arrive within a predefined time interval.
 * **Interquartile Range (IQR)**: Using statistical methods to identify outliers based on the interquartile range.
-* **Z-score**: Applying standard deviation-based analysis to identify anomalies in the data distribution.
+* **Z-score**: Applying standard deviation-based analysis to identify anomalies in data distribution.
 
 Each anomaly detection method is implemented as SQL queries within separate Tinybird Pipes and published as an API Endpoint. 
 
@@ -33,7 +33,7 @@ The main components of this project are:
 
 ## Anomaly detection methods
 
-This repository includes a `/content` folder with descriptions of each anomaly detection method (see links below to learn more): 
+This repository includes a `/content` folder with descriptions of each anomaly detection method. Follow the links below to learn about the detection method, see example queries and Pipe definitions, and see detection examples: 
 
 * **[Out-of-range](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/out-of-range.md)** - Compares data with a set maximum and minimum values. This recipe works with individual data points, and uses the most simple queries.  
 * **[Timeout](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/timeout.md)** - Finds the most recent report for each sensor and checks if it is within the 'timeout' window.  
@@ -53,11 +53,11 @@ This Tinybird project offers two designs with distinct sets of Pipes for impleme
 
 * **Individual endpoints** where checks for individual anomaly types are made separately with API requests. So, each anomaly type has its own API Endpoint. With these endpoints you can pick and choose the anomaly types you want to detect, and make requests as needed. Every endpoint, except for the `timeout` type, has a `detect_window_seconds` query parameter that enables you to adjust what data interval to check based on when you last made a request. With the `timeout` API Endpoint, you can specify a `seconds` query parameter and it returns any sensor that has not reported within that amount of time.
 
-Results from these requests are not logged or archived. This design has the advantage of having less latency when checking for real-time anomalies. When making requests,  anomalies are checked for and reported on within milliseconds. This design has the disadvantage of requiring five separate endpoints to be queried to monitor all anomaly types. 
+  Results from these requests are not logged or archived. This design has the advantage of having less latency when checking for real-time anomalies. When making requests,  anomalies are checked for and reported on within milliseconds. This design has the disadvantage of requiring five separate endpoints to be queried to monitor all anomaly types. 
 
 * **Copy Pipes that write anomaly detection results to a common log**. With this model, each anomaly type has its own Copy Pipe which runs type-specific queries and generates detection results that are eventually written to a shared `copy_log` Data Source. Every minute, the Copy Pipes write their results to a `copy_log_duplicate` Data Source, since event duplicates are likely since the copy time intervals are designed to slightly overlap to help ensure no events are missed between copying intervals. To deduplicate the data, a 
 
-With a shared anomaly log, a single endpoint can provide a compilation of the five anomaly types. Since this design depends on Copy Pipes, which runs on a few-minute interval, it has the disadvantage of increased latency between when an anomaly is first detected and when it arrives in the `copy_log` Data Source. 
+  With a shared anomaly log, a single endpoint can provide a compilation of the five anomaly types. Since this design depends on Copy Pipes, which runs on a few-minute interval, it has the disadvantage of increased latency between when an anomaly is first detected and when it arrives in the `copy_log` Data Source. 
 
 Note that detection events are first written to a `copy_log_duplicate` Data Source, then a Materialized View is used to deduplicate events into the `copy_log` Data Source. 
 
@@ -78,9 +78,9 @@ If you have an active Tinybird project that you would like to build these detect
       * Push the contents to Tinybird with `tb push`
 * Update Node SQL queries to match your own schema. All of the anomaly detection recipes are based exclusivey on these three schema fields, where `id` is the unique identifier of your sensors, and `value` is the data value being tested for anomalies :
 
-* `id` Int16
-* `timestamp` DateTime
-* `value` Float32
+  * `id` Int16
+  * `timestamp` DateTime
+  * `value` Float32
 
 Assuming your schema uses different names, you can either update the queries accordingly, or build a transformation Pipe to renames these using aliases. 
 
