@@ -38,6 +38,24 @@ Note:
 * Choosing an appropriate statistics window size is crucial. A small window may be too sensitive to fluctuations, while a large window might miss recent changes.
 * Z-scores are less effective for highly seasonal or non-stationary time series data, where the mean and standard deviation might exhibit significant trends over time.
 
+## Generating a Common Table Expression of statistics
+
+This recipe depends on a Common Table Expression (CTA) for generating averages and standard deviation. The following query is an example CTA that calculates the average and standard deviation for the last 30 minutes of sensor data. 
+
+```sql
+WITH stats AS (
+    SELECT id,
+        avg(value) AS average,
+        stddevPop(value) AS stddev
+    FROM incoming_data
+    WHERE timestamp BETWEEN (NOW() - INTERVAL 30 MINUTE) AND NOW()
+    GROUP BY id  
+)
+```
+
+With this set up, the following query can reference the `stats` result set. 
+
+In our production Pipe, this query is updated to support filtering by sensor id and setting the duration of the *statistics* window. See the `Interquartile Range` recipe for another example CTA.
 
 ## `z_score` Pipe and Endpoint
 

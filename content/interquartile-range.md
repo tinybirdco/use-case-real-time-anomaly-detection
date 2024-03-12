@@ -28,6 +28,28 @@ Data points that are below or above some level based on a multiplier of this IQR
 * values < Q1 - (IQR * 1.5) 
 * values > Q3 + (IQR * 1.5) 
 
+
+## Generating a Common Table Expression of statistics
+
+This recipe depends on a Common Table Expression (CTA) for generating statistical quartiles. The following query is an example CTA that calculates first (Q1) and third (Q3) quartiles and calculates a threshold for the last 30 minutes of sensor data. 
+
+```sql
+WITH stats AS (
+    SELECT id,
+        quantileExact(0.25) (value) AS lower_quartile,
+        quantileExact(0.75) (value) AS upper_quartile,
+        (upper_quartile - lower_quartile) * 1.5 AS IQR
+    FROM incoming_data
+    WHERE timestamp BETWEEN (NOW() - INTERVAL 30 MINUTE) AND NOW()
+    GROUP BY id  
+)
+```
+
+With this set up, the following query can reference the `stats` result set. 
+
+In our production Pipe, this query is updated to support filtering by sensor id and setting the duration of the *statistics* window. See the `Z-score` recipe for another example CTA.
+
+
 ## `iqr` Pipe and Endpoint
 
 The `iqr` Pipe consists of a single Node: 

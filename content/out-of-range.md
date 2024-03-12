@@ -12,7 +12,7 @@
 
 ## Introduction
 
-Establishing threshold limits helps identify abnormal sensor readings. If a sensor reports a value outside of a valid range defined by minimum and maximum values. This method is effective for detecting sudden spikes or drops in data that may indicate a malfunction or abnormal conditions.
+Establishing threshold limits helps identify abnormal sensor readings. If a sensor reports a value outside of a valid range defined by minimum and maximum values. This method is effective for detecting sudden spikes or drops in data that may indicate a malfunction or abnormal conditions. This recipe can also be used to test latitude and longitude values and implement a 'bounding box' for validating location data. 
 
 This example query illustrates how this simple recipe works: 
 
