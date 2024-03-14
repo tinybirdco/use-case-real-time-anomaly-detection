@@ -87,6 +87,13 @@ Assuming your schema uses different names, you can either update the queries acc
 
 The heart of this project are five API Endpoints that individually implement different anomaly detection methods. By supporting a set of query parameters, these endpoints provide flexible ways to detect anomalies. 
 
+* Out-of-range: https://api.tinybird.co/v0/pipes/out_of_range.json
+* Timeout: https://api.tinybird.co/v0/pipes/timeout.json
+* Rate-of-change: https://api.tinybird.co/v0/pipes/rate_of_change.json
+* Interquartile range: https://api.tinybird.co/v0/pipes/iqr.json
+* Z-score: https://api.tinybird.co/v0/pipes/z_score.json
+
+
 Collectively, these endpoints support the following query parameters:
 
 * **sensor_id** - All endpoints support the ability to select a single sensor of interest. If not used, results for all sensors are returned.
