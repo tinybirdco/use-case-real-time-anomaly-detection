@@ -1,4 +1,3 @@
-
 # Anomaly detection 
 
 This project is a collection of content in support of demonstrating how Tinybird can be used to detect anomalies and support anomaly-detection systems. With this project, we aim to provide a practical guide for data engineers, analysts, and decision-makers interested in detecting anomalies in data ingested into Tinybird. 
@@ -18,18 +17,47 @@ The project focuses on dectecting five types of anomalies:
 
 Each anomaly detection method is implemented as SQL queries within separate Tinybird Pipes and published as an API Endpoint. 
 
-
 ## Project resources
 
 The main components of this project are:
 
 * A **Tinybird Data Project** in the `tinybird` folder with Pipes that implement different recipes to detect outliers and anomalies. It also provides Data Source definitions, including their data schema and database details. 
 
-* A **data generator** that emits time-series data with outliers and anomalies. With this script you can curate data with prescibed outliers and trends.  See [HERE](./data-generator/readme.md) for more details. 
+* A **data generator** that emits time-series data with outliers and anomalies. With this script you can curate data with prescibed outliers and trends. The general frequency of anomalies can be *tuned* in a configuration file by setting initial values, expected rates-of-change, thresholds such as maximums and minimums, definitions of 'step' functions, and the precentage of out-of-bounds values. The velocity of data generation is also configurable. While developing these detection methods, a data rate of around ten events per second was used. See [HERE](./data-generator/readme.md) for more details. 
 
 * A **Grafana dashboard** that displays the time-series data along with anomaly detection summaries. Its JSON description is [HERE](./dashboard/anomaly-detection.json).
 
 ![Anomaly detection dashboard](./charts/dashboard-poc.png)
+
+## Endpoints for detecting anomalies
+
+At the heart of this project are five Tinybird API Endpoints that individually implement different anomaly detection methods. By supporting a set of query parameters, these endpoints provide flexible ways to detect anomalies. 
+
+* **Out-of-range**: https://api.tinybird.co/v0/pipes/out_of_range.json
+* **Timeout**: https://api.tinybird.co/v0/pipes/timeout.json
+* **Rate-of-change**: https://api.tinybird.co/v0/pipes/rate_of_change.json
+* **Interquartile range**: https://api.tinybird.co/v0/pipes/iqr.json
+* **Z-score**: https://api.tinybird.co/v0/pipes/z_score.json
+
+Collectively, these endpoints support the following query parameters:
+
+* **sensor_id** - All endpoints support the ability to select a single sensor of interest. If not used, results for all sensors are returned.
+
+* **detection_window_seconds** - Defines the time window (in seconds) for selecting data points to examine for anomalies. When polling detection endpoints, this parameter can be set the polling interval. For example, if you check on an amomaly type every minute, setting this to 60 seconds will check all data that arrived since the last request.  
+
+* **stats_window_minutes** - The Z-score and interquartile range (IQR) methods depend on the time window (in minutes) for calculating averages and standard deviations for Z-scores, and first and third quartiles used for calculating IQRs.
+
+* **iqr_multiplier** - The multiplier of the IQR to set the range for testing for IQR anomalies.
+
+* **zscore_threshold** - The threshold for determining Z-score outliers, with scores higher than this detected as anomalies. Compared with absolute value of Z-score.
+
+* **max_slope** - Maximum slope, any events with a rate-of-change higher than this is flagged as an anomaly.
+
+* **min_value** - Minimum threshold, readings less than this number will be detected as out-of-range anomalies.
+
+* **max_value** - Maximum threshold, readings greater than this number will be detected as out-of-range anomalies.
+
+* **seconds** - Instead of a detection time window, the timeout endpoint accepts this parameter. If a sensor has not reported in this number of seconds, it is considered 'timedout'. Defaults to 30 seconds.
 
 ## Anomaly detection methods
 
@@ -83,44 +111,5 @@ If you have an active Tinybird project that you would like to build these detect
 
 Assuming your schema uses different names, you can either update the queries accordingly, or build a transformation Pipe to renames these using aliases. 
 
-## Endpoints for detecting anomalies
 
-The heart of this project are five API Endpoints that individually implement different anomaly detection methods. By supporting a set of query parameters, these endpoints provide flexible ways to detect anomalies. 
-
-* Out-of-range: https://api.tinybird.co/v0/pipes/out_of_range.json
-* Timeout: https://api.tinybird.co/v0/pipes/timeout.json
-* Rate-of-change: https://api.tinybird.co/v0/pipes/rate_of_change.json
-* Interquartile range: https://api.tinybird.co/v0/pipes/iqr.json
-* Z-score: https://api.tinybird.co/v0/pipes/z_score.json
-
-
-Collectively, these endpoints support the following query parameters:
-
-* **sensor_id** - All endpoints support the ability to select a single sensor of interest. If not used, results for all sensors are returned.
-
-* **detection_window_seconds** - Defines the time window (in seconds) for selecting data points to examine for anomalies. When polling detection endpoints, this parameter can be set the polling interval. For example, if you check on an amomaly type every minute, setting this to 60 seconds will check all data that arrived since the last request.  
-
-* **stats_window_minutes** - The Z-score and interquartile range (IQR) methods depend on the time window (in minutes) for calculating averages and standard deviations for Z-scores, and first and third quartiles used for calculating IQRs.
-
-* **iqr_multiplier** - The multiplier of the IQR to set the range for testing for IQR anomalies.
-
-* **zscore_threshold** - The threshold for determining Z-score outliers, with scores higher than this detected as anomalies. Compared with absolute value of Z-score.
-
-* **max_slope** - Maximum slope, any events with a rate-of-change higher than this is flagged as an anomaly.
-
-* **min_value** - Minimum threshold, readings less than this number will be detected as out-of-range anomalies.
-
-* **max_value** - Maximum threshold, readings greater than this number will be detected as out-of-range anomalies.
-
-* **seconds** - Instead of a detection time window, the timeout endpoint accepts this parameter. If a sensor has not reported in this number of seconds, it is considered 'timedout'. Defaults to 30 seconds.
-
-## Generating time-series data
-
-For this project, a first step was building tools for generating time-series data with prescribed anomalies and outliers in it. These tools generate a time-series with the following features:
-* *Steady-state* values with small random fluctuations.
-* *Random and isolated outliers* that are outside of a "valid" range.  
-* *Step-functions* where the data jumps upwards and downwards. Here the slope between points is an anomaly.
-* Sensors that *stop reporting*.
-
-Kicking off the project with a set of data generator tools. These tools generate single-value time-series data for a set of sensors. See the [the data-generator readme](./data-generator/readme.md) for more details.
 
