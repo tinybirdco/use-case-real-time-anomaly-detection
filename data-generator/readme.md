@@ -1,74 +1,72 @@
-Building a proof-of-concept script for composing the time-series data. The thought is to have one set of tools for creating data sets that can be replayed, and another for generating a live data feed. 
+# Data generation 
 
-With data set files, we will be able to curate datasets with anomaly artifacts that complements the story that drove the data design.  
+The anaomaly detection recipes were developed with data generated with the `anomay-dataset-live.py` script. This script generates a set of sensors and starts emitting high frequency 'reports' from them. 
 
-Started with a script that generates and writes data set files. Now refactoring to generate a real-time time-series, using the same "data with anomalies" design, but instead posting the data to the Events API. 
+The generated time-series data can be prescribed with different types of anomalous data, including out-of-range reports, step functions that can produce rate-of-change outliers, and timeouts.
 
-### Data generation 
+Sensor data patterns can also be prescribed with a *trend* setting of either 'up' or 'down'. 
 
-Kicking off the project with a set of data generator tools. These tools generate single-value time-series data for a set of sensors. Data from the sensors are emitted on a configured interval.
+For this project, recipes were developed on a set of 10 sensors that emit a report approximately every second. With these settings, this script emits 1.8M reports per day. 
 
-See the [the data-generator readme](./data-generator/readme.md) for more details.
+This script posts reports to Tinybird using the [Events API](https://www.tinybird.co/docs/api-reference/events-api). 
 
+This script was written with Python 3.11. By default the script looks for its configuration file (`settings.yaml`) in its root folder. 
 
-### Configuring the data generator
+## Configuring the data generator
 
-The following settings are set in a `settings.yaml` file:
+The `settings.yaml` file is used to configure data generation details. 
+
+Parameters in this file are used to set thimgs such as:
+
+* The number of sensors emitting data values. 
+* The amount of seconds to wait between generating a new set of sensor values. 
+* How many reports to batch into a single Events API post request.
+* A range for initializing sensors. Note that the script will attempt to retrieve previous values from a `most_recent` endpoint before initiating it.
+* The percentage of out-of-bounds readings along with minimum and maximum thresholds. 
+* The maximum amount of change between subsequent reports for 'normal' changes. 
+* The percentage of times a sensor experiences a 'non-normal' *step function* between reports, and a range for these step functions. 
+* Sensors can also be configured to have a 'up' (rising) or 'down' (falling) trend. See below for examples of these. 
+* Note that the script is hardcoded to timeout a specific sensor (sensor id 5). This type of anomaly should be configurable. 
+Here is an example of a `settings.yaml` file:
 ```
 num_sensors: 10
+post_batch_size: 20
+sleep_seconds: 1       #How long to pause between sensor value updates... 
 num_iterations: 1000000
 
-id_init_min: 1400
-id_init_max: 1600
+id_init_min: 300
+id_init_max: 1500
 
-valid_min: 500
-valid_max: 2500
-percent_out_of_bounds: 0.05
-percent_out_of_bounds_high: 50
+valid_min: 100
+valid_max: 2000
+percent_out_of_bounds: 0.03
+percent_out_of_bounds_high: 100
 
 value_max: 3000
 value_min: 0
-value_max_normal_change: 1
+value_max_normal_change: 2
 
 step_min: 20
 step_max: 50
-percent_step: 0.03
+percent_step: 0.05
 percent_step_trend: 0.06
 
 sensor_overrides:
+    - id: 1
+      trend: null
+      initial_value: 1000
+      outliers: True
     - id: 2
       trend: 'up'
       initial_value: 600
+      outliers: False
     - id: 3
       trend: 'down'
-      initial_value: 2400  
+      initial_value: 1950  
+      outliers: False
 ```
-
-
-### anomaly-dataset-live.py
-
-Posts each new report to the Events API. No longer using synthetic timestamps and now everything is NowUTC(). 
 
 If this POC evolves, these two script could share common "generate data with anomalies" code. 
-
-### anomaly-dataset-to-file.py
-
-Builds CSV files that look like this: 
-
-```
-Timestamp,sensor 1,sensor 2,sensor 3,sensor 4,sensor 5,sensor 6,sensor 7,sensor 8,sensor 9,sensor 10
-2023-11-02 16:55:16.0,540,568,200,700,592,684,497,637,471,601
-2023-11-02 16:55:17.0,539.98,568.25,199.94,699.64,592.9,684.34,497.98,636.49,470.87,600.71
-2023-11-02 16:55:18.0,540.74,567.79,200.87,700.25,592.25,683.35,497.09,635.95,471.71,600.89
-2023-11-02 16:55:19.0,540.59,568.05,200.99,700.14,591.71,682.7,497.49,635.01,471.38,600.44
-2023-11-02 16:55:20.0,539.8,568.59,200.47,699.15,590.72,683.48,497.1,635.1,470.87,600.43
-2023-11-02 16:55:21.0,540.71,569.56,200.18,699.91,590.83,683.9,496.76,635.55,470.6,600.94
-2023-11-02 16:55:22.0,541.1,570.26,199.85,700.32,590.47,684.33,496.33,636.14,470.1,600.61
-2023-11-02 16:55:23.0,541.52,570.17,200.21,700.87,590.73,683.94,496.4,635.36,470.85,600.13
-2023-11-02 16:55:24.0,541.8,569.46,199.55,700.77,590.4,684.48,497.24,634.86,470.6,599.4
-2023-11-02 16:55:25.0,541.52,569.08,199.14,699.79,591.34,684.65,496.25,634.55,471.46,598.65
-2023-11-02 16:55:26.0,541.8,569.32,199.54,699.53,591.86,685.17,496.55,635.26,470.58,599.07
-```
 
 
 ### Trend types
@@ -86,3 +84,6 @@ Sensors can be seeded with a *trend* setting.
 #### Trend down
 
 ![Trending down](../charts/trend-down.png)
+
+
+
