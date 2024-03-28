@@ -1,4 +1,4 @@
-# Real-time Anomaly detection 
+# Real-time Anomaly Detection 
 
 This repository is a collection of content in support of demonstrating how Tinybird can be used to detect anomalies in real-time and support anomaly-detection systems. With this project, we aim to provide a practical guide for data engineers, analysts, and decision-makers interested in detecting anomalies in data ingested into Tinybird. 
 
