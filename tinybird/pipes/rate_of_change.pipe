@@ -9,8 +9,6 @@ Key detail seems to be in this window function detail:
 `(PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) `
 
 
-TOKEN "rate_of_change_read" READ
-
 NODE calculating_slope
 DESCRIPTION >
     Calculates the slope between the most recent data and the previous data.
@@ -18,29 +16,28 @@ DESCRIPTION >
 SQL >
 
     %
-    {% set _detect_window_seconds_default = 600 %}
-    {% set _max_slope = 3 %}
-
+    WITH
+      {{ Int16(detect_window_seconds, 600, description="Search this many most recent seconds of the data history.") }} AS detect_window_seconds,
+      {{ Float32(max_slope, 3, description="Maximum slope, any higher than this are returned. Floating point")}} AS max_slope 
     SELECT id, 
       timestamp, 
       previous_timestamp,
-      (value - previous_value) / (timestamp - previous_timestamp) as slope,
+      (value - previous_value) / (timestamp - previous_timestamp) AS slope,
       value, 
       previous_value,
-      (value - previous_value) as value_diff,
-      (timestamp - previous_timestamp) as time_diff,
-      {{Int16(max_slope, _max_slope, description="Integer. Maximum slope, any higher than this are returned.")}} as max_slope,
+      (value - previous_value) AS value_diff,
+      (timestamp - previous_timestamp) AS time_diff,
+      max_slope,
       lagInFrame(timestamp, 1) OVER 
         (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_timestamp, 
       lagInFrame(value, 1) OVER
         (PARTITION BY id ORDER BY timestamp ASC ROWS BETWEEN 1 PRECEDING AND 1 PRECEDING) AS previous_value
     FROM incoming_data
-    WHERE timestamp > NOW() - INTERVAL {{Int16(detect_window_seconds, _detect_window_seconds_default, description="Integer. Examine this many seconds of the most recent data history.")}} SECOND
+    WHERE timestamp > NOW() - INTERVAL detect_window_seconds SECOND
       {% if defined(sensor_id) %}               
         AND id = {{ Int32(sensor_id,description="Used to select a single sensor of interest. Otherwise, returns results for all sensors.")}}
       {% end %}    
     ORDER BY timestamp DESC
-
 
 
 

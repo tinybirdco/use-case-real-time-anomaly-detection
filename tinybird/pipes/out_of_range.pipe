@@ -3,28 +3,34 @@ DESCRIPTION >
 See [HERE](https://github.com/tinybirdco/anomaly-detection/blob/main/content/out-of-range.md) for more background on this recipe.
 
 
-TOKEN "out_of_range_read" READ
+TOKEN "out_of_range_temp_endpoint_read_2144" READ
 
 NODE endpoint
-DESCRIPTION >
-    Tests each data in the time window against a maximum and minimum value.
-
 SQL >
 
     %
-    {% set _min_value_default = 0 %}
-    {% set _max_value_default = 10000 %}
-    {% set _detect_window_seconds_default = 600 %}
-
-    SELECT id, timestamp, value, 
-       {{Int16(min_value, _min_value_default, description="Integer. Minimum threshold, readings less than this number will be detected as anomalies.",required=False)}} as min_value, 
-       {{Int16(max_value, _max_value_default, description="Integer. Maximum threshold, readings greater than this number will be detected as anomalies.",required=False)}} as max_value 
+    WITH
+      {{ Int16(detect_window_seconds, 600, description="Search this many most recent seconds of the data history.") }} AS detect_window_seconds,
+      {{ Int16(min_value, 0, description="Integer. Minimum threshold, readings less than this number will be detected as anomalies.", required=False) }} AS min_value,
+      {{ Int32(max_value, 100000, description="Integer. Maximum threshold, readings greater than this number will be detected as anomalies.", required=False) }} AS max_value
+    SELECT id, timestamp, value
     FROM incoming_data
-    WHERE value < min_value OR value > max_value
+    WHERE 1
+    {% if defined(min_value) %}
+      {% if defined(max_value) %}
+        AND value < min_value OR value > max_value
+      {% else %}
+        AND value < min_value
+      {% end %}
+    {% elif defined(max_value) %}
+        AND value > max_value
+    {% else %}
+      {{ error('You must define at least one of min_value or max_value') }}
+    {% end %}
     {% if defined(sensor_id) %}               
       AND id = {{ Int16(sensor_id, description="Used to select a single sensor of interest. Optional.")}}       
     {% end %}    
-    AND timestamp > NOW() - INTERVAL {{Int16(detect_window_seconds, _detect_window_seconds_default, description="Search this many most recent seconds of the data history.")}} SECONDS
+    AND timestamp > NOW() - INTERVAL detect_window_seconds SECONDS
     ORDER BY timestamp DESC
 
 

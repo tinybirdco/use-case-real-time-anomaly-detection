@@ -4,22 +4,20 @@ DESCRIPTION >
 See [HERE](https://github.com/tinybirdco/anomaly-detection/blob/main/content/z-score.md) for more background on this recipe.
 
 
-TOKEN "simple_z_score_read" READ
-
 NODE calculate_z_score
 SQL >
 
     %
-    {% set _zscore_threshold_default = 3 %}  # The threshold for determining Z-score outliers. Floating point. 
-    {% set _stats_window_minutes_default = 10 %}  # Statistical averages and standard deviations are based on this most recent window.
-    {% set _detect_window_seconds_default = 600 %} # Defines the time window (in SECONDS) for selecting data points to examine for anomalies.
-
-    WITH stats AS (
-        SELECT id,
+    WITH 
+    {{ Float32(zscore_threshold, 2, description="Floating point number. The threshold for determining Z-score outliers, with scores higher than this detected as anomalies. Compared with absolute value of Z-score.")}} AS zscore_threshold,
+    {{ Int32(detect_window_seconds, 600, description="Defines the time window (in SECONDS) for selecting data points to examine for anomalies. If polling on an interval, this can be set to match that interval to minimize duplicate detections.")}}  AS detect_window_seconds,
+    stats AS (
+      WITH  {{ Int16(stats_window_minutes, 10, description="Defines the time window (in MINUTES) for calculating data averages and standard deviations used to calculate Z-score")}} AS stats_window_minutes    
+      SELECT id,
             avg(value) AS average,
             stddevPop(value) AS stddev
         FROM incoming_data
-        WHERE timestamp BETWEEN (NOW() - INTERVAL {{Int16(stats_window_minutes, _stats_window_minutes_default ,description="Defines the time window (in MINUTES) for calculating data averages and standard deviations used to calculate Z-score")}} MINUTE) AND NOW()
+        WHERE timestamp BETWEEN (NOW() - INTERVAL stats_window_minutes MINUTE) AND NOW()
            {% if defined(sensor_id) %}               
               AND id = {{ Int32(sensor_id, description="Used to select a single sensor of interest. Optional.")}}       
            {% end %}  
@@ -31,10 +29,10 @@ SQL >
          (i.value - stats.average)/stats.stddev AS zscore,
          stats.average,
          stats.stddev,
-         {{Float32(zscore_threshold, _zscore_threshold_default, description="Floating point number. The threshold for determining Z-score outliers, with scores higher than this detected as anomalies. Compared with absolute value of Z-score.")}} AS zscore_multiplier
+         zscore_threshold
     FROM incoming_data i
     JOIN stats s ON s.id = i.id
-    WHERE timestamp BETWEEN NOW() - interval {{Int32(detect_window_seconds, _detect_window_seconds_default, description="Defines the time window (in SECONDS) for selecting data points to examine for anomalies. If polling on an interval, this can be set to match that interval to minimize duplicate detections.")}} SECOND AND NOW()
+    WHERE timestamp BETWEEN NOW() - INTERVAL detect_window_seconds SECOND AND NOW()
     ORDER BY timestamp DESC
 
 
@@ -47,13 +45,13 @@ SQL >
        id,
        value,
        Round(zscore,2) AS zscore,
-       multiIf(zscore < (-1 * zscore_multiplier), 'low', zscore > zscore_multiplier, 'high','ok') AS test,
+       multiIf(zscore < (-1 * zscore_threshold), 'low', zscore > zscore_threshold, 'high','ok') AS test,
        ROUND(average,2) AS average,
        ROUND(stddev,2) AS stddev,
-       zscore_multiplier
+       zscore_threshold
     FROM calculate_z_score
     WHERE test = 'low' OR test = 'high' 
-     AND zscore < -1 * zscore_multiplier OR zscore > zscore_multiplier 
+    AND zscore < -1 * zscore_threshold OR zscore > zscore_threshold 
     ORDER by timestamp DESC
 
 

@@ -5,20 +5,22 @@ See [HERE](https://github.com/tinybirdco/anomaly-detection/blob/main/content/tim
 This Pipe select each sensor's most recent data report, and determines if it has reported within the number of specified seconds.
 
 
-TOKEN "timeout_read" READ
-
 NODE get_most_recent
 DESCRIPTION >
     Compile the most recent reports from all sensors.
 
 SQL >
 
+    %
+     WITH {{ Int16(seconds,60,description="If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'. Defaults to 60.")}} AS seconds
      SELECT id, 
-          timestamp, 
-          value
-        FROM incoming_data
-        ORDER BY timestamp DESC
-        LIMIT 1 BY id
+      timestamp, 
+      value,
+      seconds
+    FROM incoming_data
+    WHERE timestamp > NOW() - INTERVAL 7 DAY
+    ORDER BY timestamp DESC
+    LIMIT 1 BY id
 
 
 
@@ -30,28 +32,11 @@ DESCRIPTION >
 SQL >
 
     %
-    SELECT * FROM get_most_recent
-    WHERE timestamp < NOW() - INTERVAL {{Int16(seconds,30,description="If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'. Defaults to 30.")}} SECONDS
-       {% if defined(sensor_id) %}               
-          AND id = {{ Int32(sensor_id, description="Used to select a single sensor of interest. Otherwise, returns results for all sensors.")}} 
-       {% end %}  
-
-
-
-NODE single_node
-SQL >
-
-    %
-
-    SELECT id, 
-          timestamp, 
-          value
-        FROM incoming_data
-         WHERE timestamp < NOW() - INTERVAL {{Int16(seconds,30,description="If a sensor has not reported in the specified aboout of seconds, it is considered 'timedout'.")}} SECONDS
-       {% if defined(sensor_id) %}               
-          AND id = {{ Int32(sensor_id, description="Used to select a single sensor of interest. Optional.")}} 
-       {% end %}  
-        ORDER BY timestamp DESC 
-        LIMIT 1 BY id
+    SELECT id, timestamp, value, seconds 
+    FROM get_most_recent
+    WHERE timestamp < NOW() - INTERVAL seconds SECONDS
+    {% if defined(sensor_id) %}               
+      AND id = {{ Int32(sensor_id, description="Used to select a single sensor of interest. Otherwise, returns results for all sensors.")}} 
+    {% end %}  
 
 
