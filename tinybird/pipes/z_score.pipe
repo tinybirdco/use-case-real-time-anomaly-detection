@@ -10,9 +10,9 @@ NODE calculate_z_score
 SQL >
 
     %
-    {% set _zscore_threshold_default = 3 %}  # The threshold for determining Z-score outliers. 
-    {% set _stats_window_minutes_default = 10 %}  # Statistical quartiles are based on this most recent window.
-    {% set _detect_window_seconds_default = 600 %} # This Pipe makes a copy every minute, so selecting events since last copy. 
+    {% set _zscore_threshold_default = 3 %}  # The threshold for determining Z-score outliers. Floating point. 
+    {% set _stats_window_minutes_default = 10 %}  # Statistical averages and standard deviations are based on this most recent window.
+    {% set _detect_window_seconds_default = 600 %} # Defines the time window (in SECONDS) for selecting data points to examine for anomalies.
 
     WITH stats AS (
         SELECT id,

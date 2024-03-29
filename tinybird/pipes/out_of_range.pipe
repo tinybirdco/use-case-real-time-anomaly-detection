@@ -12,8 +12,8 @@ DESCRIPTION >
 SQL >
 
     %
-    {% set _min_value_default = 200 %}
-    {% set _max_value_default = 2000 %}
+    {% set _min_value_default = 0 %}
+    {% set _max_value_default = 10000 %}
     {% set _detect_window_seconds_default = 600 %}
 
     SELECT id, timestamp, value, 
@@ -24,7 +24,7 @@ SQL >
     {% if defined(sensor_id) %}               
       AND id = {{ Int16(sensor_id, description="Used to select a single sensor of interest. Optional.")}}       
     {% end %}    
-    AND timestamp > NOW() - INTERVAL {{Int16(detect_window_seconds, _detect_window_seconds_default, description="Search this many most recent minutes of the data history.")}} SECONDS
+    AND timestamp > NOW() - INTERVAL {{Int16(detect_window_seconds, _detect_window_seconds_default, description="Search this many most recent seconds of the data history.")}} SECONDS
     ORDER BY timestamp DESC
 
 
