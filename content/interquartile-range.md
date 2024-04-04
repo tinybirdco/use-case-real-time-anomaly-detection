@@ -8,7 +8,7 @@
 
 **Query parameters:**
 * **sensor_id** - Used to select a single sensor of interest. Otherwise, returns results for all sensors. 
-* **detection_window_seconds** - Defines the time window (in seconds) for selecting data points to examine for anomalies.
+* **detect_window_seconds** - Defines the time window (in seconds) for selecting data points to examine for anomalies.
 * **stats_window_minutes** - Defines the time window (in minutes) for calculating first and third quartiles used to calculate IQR.
 * **iqr_multiplier** - The multiplier of the IQR to set the range for testing for IQR anomalies.
 * **max_per_sensor** - Used to limit the number of IQR anomalies to return by sensor. 
