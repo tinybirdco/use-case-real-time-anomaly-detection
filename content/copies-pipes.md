@@ -1,10 +1,10 @@
-# Using Copy Pipes to log anomalies
+# Copy Pipes and generating a common anomaly log
 
 To start this discussion, let's describe what [Copy Pipes](https://www.tinybird.co/docs/publish/copy-pipes.html#copy-pipes) are. In any Pipe, a single Node can be selected to make a copy of its results and write them into a Data Source. This *Copy Pipe* process can be triggered on demand, or on a selected interval. 
 
 ### Considering the number of endpoints to report on all anomaly types
 
-As part of this project, we have five API Endpoints that scan for and return anomalies, one for each anomaly type. These endpoints provide flexible ways to detect anomalies in real-time time-series data. 
+As part of this project, we have five API endpoints that scan for and return anomalies, one for each anomaly type. These endpoints provide flexible ways to detect anomalies in real-time time-series data. 
 
 These endpoints make it possible to detect anomalies in streamed and event data with little latency. Most of the queries shared as part of this project take only milliseconds to return results. 
 
@@ -18,11 +18,11 @@ While reviewing queries to make them more efficient is a critical step for imple
 
 ### Can we build a single API Endpoint to return detections for all anomaly types? 
 
-It would be useful to have a single endpoint that shares all detection events across every anomaly type. Instead of five separate endpoints, a single endpoint would require 80% less requests to integrate all types.  
+It would reduce the number of requests to have a single endpoint that shares all detection events across every anomaly type. Instead of five separate endpoints, a single endpoint would require 80% less requests to integrate all types.  
 
 While it is probably possible to chain all Nodes across the five types and come up with a single Pipe and API Endpoint to check for and report on all anomaly types, that sounds like a recipe for comprehension and maintenance disasters. 
 
-Fortunately both Materialized Views and Copy Pipes have the ability to support the model of multiple Pipes writing into a common Data Source. As long as each Pipe generates a common schema, they can write their unique contributions to a shared Data Source. 
+Fortunately, both Materialized Views and Copy Pipes have the ability to support the model of multiple Pipes writing into a common Data Source. As long as each Pipe generates a common schema, they can write their unique contributions to a shared Data Source. 
 
 Since time window functions are not supported with Materialized Views, and one anomaly recipe was based on window functions (`rate_of_change`), we turned to Copy Pipes to create a Data Source that compiles all detection events into one place. 
 
