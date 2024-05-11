@@ -16,7 +16,7 @@ This script was written with Python 3.11. By default the script looks for its co
 
 The `settings.yaml` file is used to configure data generation details. 
 
-Parameters in this file are used to set thimgs such as:
+Parameters in this file are used to set things such as:
 
 * The number of sensors emitting data values. 
 * The amount of seconds to wait between generating a new set of sensor values. 
@@ -26,7 +26,8 @@ Parameters in this file are used to set thimgs such as:
 * The maximum amount of change between subsequent reports for 'normal' changes. 
 * The percentage of times a sensor experiences a 'non-normal' *step function* between reports, and a range for these step functions. 
 * Sensors can also be configured to have a 'up' (rising) or 'down' (falling) trend. See below for examples of these. 
-* Note that the script is hardcoded to timeout a specific sensor (sensor id 5). This type of anomaly should be configurable. 
+* Note that the script is hardcoded to timeout a specific sensor (sensor id 5). This type of anomaly should be configurable.
+  
 Here is an example of a `settings.yaml` file:
 ```
 num_sensors: 10
@@ -66,7 +67,7 @@ sensor_overrides:
       outliers: False
 ```
 
-If this POC evolves, these two script could share common "generate data with anomalies" code. 
+If this POC evolves, these two scripts could share common "generate data with anomalies" code. 
 
 
 ### Trend types
