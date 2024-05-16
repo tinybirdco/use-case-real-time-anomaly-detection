@@ -63,11 +63,11 @@ Collectively, these endpoints support the following query parameters:
 
 This repository includes a `/content` folder with descriptions of each anomaly detection method. Follow the links below to learn about the detection method, see example queries and Pipe definitions, and see detection examples: 
 
-* **[Out-of-range](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/out-of-range.md)** - Compares data with a set of maximum and minimum values. This recipe works with individual data points, and uses the most simple queries.  
-* **[Timeout](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/timeout.md)** - Finds the most recent report for each sensor and checks if it is within the 'timeout' window.  
-* **[Rate-of-change](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/rate-of-change.md)** - Looks up the two most recent data points and determines the rate of change, or slope, and compares that to a maximum allowable slope.  
-* **[Interquartile-range](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/interquartile-range.md)** - Generates a `IQR` range based on first and third quartiles and a multiplier and used to define an 'acceptable' range. 
-* **[Z-score](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/content/z-score.md)** - Generates a `Z score` based on data averages and standard deviations, with all scores above a threshold identified as anomalies.  
+* **[Out-of-range](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/tutorials/out-of-range.md)** - Compares data with a set of maximum and minimum values. This recipe works with individual data points, and uses the most simple queries.  
+* **[Timeout](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/tutorials/timeout.md)** - Finds the most recent report for each sensor and checks if it is within the 'timeout' window.  
+* **[Rate-of-change](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/tutorials/rate-of-change.md)** - Looks up the two most recent data points and determines the rate of change, or slope, and compares that to a maximum allowable slope.  
+* **[Interquartile-range](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/tutorials/interquartile-range.md)** - Generates a `IQR` range based on first and third quartiles and a multiplier and used to define an 'acceptable' range. 
+* **[Z-score](https://github.com/tinybirdco/use-case-anomaly-detection/blob/main/tutorials/z-score.md)** - Generates a `Z score` based on data averages and standard deviations, with all scores above a threshold identified as anomalies.  
 
 The Interquartile-range and Z-score methods generate time-series statistics to identify *pattern* changes, rather than triggering on a single or pair of isolated data points.
 
