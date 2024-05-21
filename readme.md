@@ -33,11 +33,11 @@ The main components of this project are:
 
 At the heart of this project are five Tinybird API Endpoints that individually implement different anomaly detection methods. By supporting a set of query parameters, these endpoints provide flexible ways to detect anomalies. 
 
-* **Out-of-range**: https://api.tinybird.co/v0/pipes/out_of_range.json
-* **Timeout**: https://api.tinybird.co/v0/pipes/timeout.json
-* **Rate-of-change**: https://api.tinybird.co/v0/pipes/rate_of_change.json
-* **Interquartile range**: https://api.tinybird.co/v0/pipes/iqr.json
-* **Z-score**: https://api.tinybird.co/v0/pipes/z_score.json
+* **Out-of-range**: `https://api.tinybird.co/v0/pipes/out_of_range.json`
+* **Timeout**: `https://api.tinybird.co/v0/pipes/timeout.json`
+* **Rate-of-change**: `https://api.tinybird.co/v0/pipes/rate_of_change.json`
+* **Interquartile range**: `https://api.tinybird.co/v0/pipes/iqr.json`
+* **Z-score**: `https://api.tinybird.co/v0/pipes/z_score.json`
 
 Collectively, these endpoints support the following query parameters:
 
@@ -110,6 +110,19 @@ If you have an active Tinybird project that you would like to build these detect
   * `value` Float32
 
 Assuming your schema uses different names, you can either update the queries accordingly, or build a transformation Pipe to renames these using aliases. 
+
+## Workshops!
+We offer a workshop based on this anomaly detection content. Check out our [upcoming workshops](https://www.tinybird.co/docs/live). 
+
+Let us know if you are interested in attending one in our [Slack community channel](https://www.tinybird.co/docs/community).
+
+Check out the deck for Anomaly Detection [HERE](./graphics/anomaly_detection_2024_05_21.pdf)
+
+![](./graphics/workshop.png)
+
+
+
+
 
 
 
