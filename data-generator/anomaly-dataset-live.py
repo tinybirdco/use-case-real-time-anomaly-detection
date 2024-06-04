@@ -8,10 +8,10 @@ import yaml
 import datetime
 from dotenv import load_dotenv
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '../config', '.env')
+dotenv_path = os.path.join(os.path.dirname(__file__), '.', '.env')
 load_dotenv(dotenv_path)
 
-with open('./data-generator/settings.yaml') as file:
+with open('./settings.yaml') as file:
     config = yaml.safe_load(file)
 
 num_sensors = config['num_sensors']
